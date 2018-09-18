@@ -47,6 +47,23 @@ legend([h1,h2],{'Radars of network','Radars used in the study'})
 
 % export_fig 'figure/paper/radarsNetwork_2.eps' -eps
 
+
+%% Stats Radars
+
+worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
+plotm(coastlat, coastlon,'k');
+geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+geoshow('worldrivers.shp','Color', 'blue')
+scatterm([dc.lat],[dc.lon],[dc.maxrange]*8,[dc.maxrange],'filled','MarkerEdgeColor','k');
+c=colorbar; c.Label.String='Max range radius of radar';
+
+worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
+plotm(coastlat, coastlon,'k');
+geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+geoshow('worldrivers.shp','Color', 'blue')
+scatterm([dc.lat],[dc.lon],100,sum(bsxfun(@eq,data.i_r,1:69)),'filled','MarkerEdgeColor','k');
+c=colorbar; c.Label.String='Number of datum per radar';
+
 %% Figure 3: Features illustration
 
 fig1=figure('position',[0 0 1200 500]);clf;
@@ -63,7 +80,8 @@ end
 scatterm([dc.lat],[dc.lon],100,S,'filled','MarkerEdgeColor','k'); colorbar('southoutside');
 
 co=get(gca,'ColorOrder');u=0;
-radars={{'fiuta'},{'denhb','bewid','frave'},{'frgre'}}; %
+co=[51,34,136;136,204,238;68,170,153;17,119,51;153,153,51;221,204,119;204,102,119;136,34,85;170,68,153]/255;
+radars={{'fikuo','fiuta','fivim'},{'denhb','bewid','frave'},{'frgre','frbor','frmom'}}; %
 for i=1:numel(radars)
     for j=1:numel(radars{i})
         u=u+1;
@@ -91,7 +109,7 @@ for i=1:numel(radars)
     end
 end
 
-% export_fig 'figure/paper/conceptual_model.eps' -eps
+% export_fig 'figure/paper/conceptual_model_3each.eps' -eps
 
 %% Figure 4: Mathematical model
 fig2=figure('position',[0 0 1000 400]);clf; clf; hold on; box on;
@@ -160,7 +178,7 @@ grid on
 %% Figure 6: Result Inferance
 
 fig6=figure('position',[0 0 1400 700]); 
-subplot(2,2,1); hold on;
+subplot(2,4,[1 2]); hold on;
 worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
 [LAT,LON] = meshgrid(min([dc.lat]):max([dc.lat]),min([dc.lon]):max([dc.lon]));
 surfm(LAT,LON,LAT*trend.p(1)+LON*trend.p(2)+trend.p(3))
@@ -169,8 +187,8 @@ geoshow('worldrivers.shp','Color', 'blue')
 colorbar;
 %print -depsc2 figure/paper/result_calibration_1.eps;
 
-fig6=figure('position',[0 0 1400 700]); 
-subplot(2,2,2); hold on;
+%fig6=figure('position',[0 0 1400 700]); 
+subplot(2,4,[3 4]); hold on;
 x=(-1:.01:1)';
 y=polyval( curve.p, x);
 z=sqrt(polyval( res.p, x));
@@ -181,26 +199,34 @@ plot(x,y,'-k','linewidth',2)
 xlabel('Normalized Night Time (NNT)'); ylabel('Normalized Bird density');  box on; %set(gca,'YScale','log')
 %print -depsc2 figure/paper/result_calibration_2.eps;
 
-fig6=figure('position',[0 0 1400 700]); 
-subplot(2,2,3); hold on;
+%fig6=figure('position',[0 0 1400 700]); 
 Gneiting = @(dist,time,range_dist,range_time,delta,gamma,beta) 1./( (time./range_time).^(2.*delta) +1 ) .* exp(-(dist./range_dist).^(2.*gamma)./((time./range_time).^(2.*delta) +1).^(beta.*gamma) );
-[tmpD,tmpT] = meshgrid(ampli.cov.d(1):1:ampli.cov.d(end),ampli.cov.t(1):0.1:ampli.cov.t(end));
-% tmpCOV=ampli.cov.parm(2).*Gneiting(ampli.cov.D,ampli.cov.T, ampli.cov.parm(3), ampli.cov.parm(4), ampli.cov.parm(5), ampli.cov.parm(6), ampli.cov.parm(7));
-tmpCOV=ampli.cov.parm(2).*Gneiting(tmpD(:), tmpT(:), ampli.cov.parm(3), ampli.cov.parm(4), ampli.cov.parm(5), ampli.cov.parm(6), ampli.cov.parm(7));
-tmpCOV=reshape(tmpCOV,size(tmpD,1),size(tmpD,2)); % tmpCOV=reshape(tmpCOV,size(ampli.cov.D,1),size(ampli.cov.D,2));
+tmpD = ampli.cov.d(1):1:ampli.cov.d(end);
+tmpT = ampli.cov.t(1):0.1:ampli.cov.t(end);
+subplot(2,4,5);
+tmpCOV=ampli.cov.parm(2).*Gneiting(tmpD, zeros(size(tmpD)), ampli.cov.parm(3), ampli.cov.parm(4), ampli.cov.parm(5), ampli.cov.parm(6), ampli.cov.parm(7));
 tmpCOV(1)=tmpCOV(1)+ampli.cov.parm(1);
-s=surf(tmpD,tmpT,tmpCOV);s.EdgeColor='none'; %s=surf(ampli.cov.D,ampli.cov.T,tmpCOV);
-view(3);xlabel('Distance [km]'); ylabel('Time [Days]'); box on; grid on; xlim([0 1500]); ylim([0 10])
-%export_fig 'figure/paper/result_calibration_3.eps' -eps
+plot(tmpD,tmpCOV,'-k','linewidth',2);
+xlabel('Distance [km]'); ylabel('Covariance'); box on; xlim([0 2000])
+subplot(2,4,6);
+tmpCOV=ampli.cov.parm(2).*Gneiting(zeros(size(tmpT)), tmpT, ampli.cov.parm(3), ampli.cov.parm(4), ampli.cov.parm(5), ampli.cov.parm(6), ampli.cov.parm(7));
+tmpCOV(1)=tmpCOV(1)+ampli.cov.parm(1);
+plot(tmpT,tmpCOV,'-k','linewidth',2);
+xlabel('Time [Days]'); ylabel('Covariance'); box on;  xlim([0 10])
 
-fig6=figure('position',[0 0 1400 700]); 
-subplot(2,2,4); hold on;
-[tmpD,tmpT] = meshgrid(res.cov.d(1):1:res.cov.d(end),res.cov.t(1):0.1:res.cov.t(end));
-tmpCOV=res.cov.parm(2).*Gneiting(tmpD(:), tmpT(:), res.cov.parm(3), res.cov.parm(4), res.cov.parm(5), res.cov.parm(6), res.cov.parm(7));
-tmpCOV=reshape(tmpCOV,size(tmpD,1),size(tmpD,2));
+%fig6=figure('position',[0 0 1400 700]); 
+tmpD = res.cov.d(1):1:res.cov.d(end);
+tmpT = res.cov.t(1):0.01:res.cov.t(end);
+subplot(2,4,7);
+tmpCOV=ampli.cov.parm(2).*Gneiting(tmpD, zeros(size(tmpD)), res.cov.parm(3), res.cov.parm(4), res.cov.parm(5), res.cov.parm(6), res.cov.parm(7));
 tmpCOV(1)=tmpCOV(1)+res.cov.parm(1);
-s=surf(tmpD,tmpT,tmpCOV);s.EdgeColor='none';
-view(3);xlabel('Distance [km]'); ylabel('Time [Days]'); box on; grid on; xlim([0 1000]); ylim([0 0.4]) 
+plot(tmpD,tmpCOV,'-k','linewidth',2);
+xlabel('Distance [km]'); ylabel('Covariance'); box on; xlim([0 1000])
+subplot(2,4,8);
+tmpCOV=ampli.cov.parm(2).*Gneiting(zeros(size(tmpT)), tmpT, res.cov.parm(3), res.cov.parm(4), res.cov.parm(5), res.cov.parm(6), res.cov.parm(7));
+tmpCOV(1)=tmpCOV(1)+res.cov.parm(1);
+plot(tmpT,tmpCOV,'-k','linewidth',2);
+xlabel('Time [Days]'); ylabel('Covariance'); box on;  xlim([0 0.4])
 %print -depsc2 figure/paper/result_calibration_4.eps;
 
 %% Figure 7: Estimation Map grid
@@ -217,13 +243,16 @@ colorbar;
 
 %% Figure 7: Result Estimation Map
 
-i_t=1+4*12+4*24*6;
-i_lat=45;
-i_lon=80;
+i_t=[1+4*12+4*24*6 1+4*12+4*24*12 1+4*12+4*24*18];
+i_lat=[5 45 120];
+i_lon=[25 80 165];
+ymax=[500 300 100];
 
-fig7=figure('position',[0 0 1400 700]); 
+nfig=numel(i_lat)+2*numel(i_t);
+
+fig7=figure('position',[0 0 1400 1400]); 
 c_axis=[-1 2];
-subplot(3,3,[1 4]); hold on;
+subplot(nfig,3,[1 3*(2*numel(i_t)-1)+1]); hold on;
 plot3( coastlon,coastlat, datenum(g.time(1))*ones(size(coastlon)),'k','linewidth',2)
 h=slice(g.lon3D,g.lat3D,datenum(g.time3D),log10(g.dens_est),[],[],datenum(g.time(1+4*12:2*4*24:end)));
 set(h,'edgecolor','none'); grid on;
@@ -232,20 +261,29 @@ ylim([g.lat(1) g.lat(end)])
 xlim([g.lon(1) g.lon(end)]); 
 zlim(datenum([g.time(1) g.time(end)]));
 view(3); box on; ylabel('Latitude'); xlabel('Longitude'); zlabel('Time '); datetick('z','dd-mmm','keeplimits')
-plot3([g.lon(1) g.lon(1) g.lon(end) g.lon(end) g.lon(1)],[g.lat(1) g.lat(end) g.lat(end) g.lat(1) g.lat(1)], datenum(g.time(i_t))*[1 1 1 1 1],'-k','linewidth',2)
-plot3( [g.lon(i_lon) g.lon(i_lon) ],[g.lat(i_lat) g.lat(i_lat)], datenum([g.time(1) g.time(end)]),'-r','linewidth',2)
+for it=1:numel(i_t)
+    plot3([g.lon(1) g.lon(1) g.lon(end) g.lon(end) g.lon(1)],[g.lat(1) g.lat(end) g.lat(end) g.lat(1) g.lat(1)], datenum(g.time(i_t(it)))*[1 1 1 1 1],'-k','linewidth',2)
+end
+for ill=1:numel(i_lat)
+    plot3( [g.lon(i_lon(ill)) g.lon(i_lon(ill)) ],[g.lat(i_lat(ill)) g.lat(i_lat(ill))], datenum([g.time(1) g.time(end)]),'-r','linewidth',2)
+end
 caxis(c_axis);
+c=colorbar('eastoutside'); c.Label.String='Bird Density [bird/m^3]';
 % export_fig 'figure/paper/estimation1.eps' -eps
 
-subplot(3,3,[2 5]);
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-plotm(coastlat, coastlon,'k');
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-surfm(g.lat2D,g.lon2D,log10(g.dens_est(:,:,i_t)));
-scatterm(g.lat(i_lat),g.lon(i_lon),'r','filled')
-c=colorbar('southoutside'); c.Label.String='Bird Density [bird/m^3]';
-caxis(c_axis);
+for it=1:numel(i_t)
+    subplot(nfig,3,(it-1)*6+[2 5]);
+    worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
+    plotm(coastlat, coastlon,'k');
+    geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+    geoshow('worldrivers.shp','Color', 'blue')
+    surfm(g.lat2D,g.lon2D,log10(g.dens_est(:,:,i_t(it))));
+    for ill=1:numel(i_lat)
+        scatterm(g.lat(i_lat(ill)),g.lon(i_lon(ill)),'r','filled')
+    end
+    %c=colorbar('southoutside'); c.Label.String='Bird Density [bird/m^3]';
+    caxis(c_axis);
+end
 
 % gtit = datenum(g.time(mask_fullday(i_t)+([-1 0 1])));
 % id = find(mean(gtit(1:2))<data.time & mean(gtit(2:3))>data.time);
@@ -253,30 +291,42 @@ caxis(c_axis);
 %     G = findgroups(data.dateradar(id));
 %     hscat=scatterm(splitapply(@mean,data.lat(id),G),splitapply(@mean,data.lon(id),G),[],splitapply(@mean,log(data.dens(id)),G),'filled','MarkerEdgeColor','k');
 % end
-subplot(3,3,[3 6]); 
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-plotm(coastlat, coastlon,'k');
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-surfm(g.lat2D,g.lon2D,log10(g.dens_sig(:,:,i_t,5)-g.dens_sig(:,:,i_t,3)));
-scatterm(g.lat(i_lat),g.lon(i_lon),'r','filled')
-c=colorbar('southoutside'); c.Label.String='Bird Density [bird/m^3]';
-caxis(c_axis);
+for it=1:numel(i_t)
+    %fig7=figure('position',[0 0 1400 1400]); 
+    subplot(nfig,3,(it-1)*6+[3 6]);
+    worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
+    plotm(coastlat, coastlon,'k');
+    geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+    geoshow('worldrivers.shp','Color', 'blue')
+    surfm(g.lat2D,g.lon2D,log10(g.dens_sig(:,:,i_t(it),5)-g.dens_sig(:,:,i_t(it),3)));
+    for ill=1:numel(i_lat)
+        scatterm(g.lat(i_lat(ill)),g.lon(i_lon(ill)),'r','filled')
+    end
+    %c=colorbar('southoutside'); c.Label.String='Bird Density [bird/m^3]';
+    caxis(c_axis);
+    %export_fig(['figure/paper/estimation' num2str(it) '.eps'],'-eps')
+end
 
-subplot(3,3,[7 9]);
-hold on;
-a=reshape(g.dens_sig(i_lat,i_lon,:,1),[],1); a(isnan(a))=0;
-b=reshape(g.dens_sig(i_lat,i_lon,:,7),[],1); b(isnan(b))=0;
-fill([g.time fliplr(g.time)]', [a ; flipud(b)],[.9 .9 .9],'EdgeColor','none')
-a=reshape(g.dens_sig(i_lat,i_lon,:,2),[],1); a(isnan(a))=0;
-b=reshape(g.dens_sig(i_lat,i_lon,:,6),[],1); b(isnan(b))=0;
-fill([g.time fliplr(g.time)]', [a ; flipud(b)],[.8 .8 .8],'EdgeColor','none')
-a=reshape(g.dens_sig(i_lat,i_lon,:,3),[],1); a(isnan(a))=0;
-b=reshape(g.dens_sig(i_lat,i_lon,:,5),[],1); b(isnan(b))=0;
-fill([g.time fliplr(g.time)]', [a ; flipud(b)],[.7 .7 .7],'EdgeColor','none')
-plot(g.time,reshape(g.dens_sig(i_lat,i_lon,:,4),[],1),'k');
-xlabel('Date'); ylabel('Bird density'); axis tight; ylim([0 500]); box on; %set(gca,'YScale','log')
-
+for ill=1:numel(i_lat)
+    subplot(nfig,3,numel(i_t)*6+3*(ill-1)+[1 3]);
+    hold on;
+    a=reshape(g.dens_sig(i_lat(ill),i_lon(ill),:,1),[],1); a(isnan(a))=0;
+    b=reshape(g.dens_sig(i_lat(ill),i_lon(ill),:,7),[],1); b(isnan(b))=0;
+    fill([g.time fliplr(g.time)]', [a ; flipud(b)],[.9 .9 .9],'EdgeColor','none')
+    a=reshape(g.dens_sig(i_lat(ill),i_lon(ill),:,2),[],1); a(isnan(a))=0;
+    b=reshape(g.dens_sig(i_lat(ill),i_lon(ill),:,6),[],1); b(isnan(b))=0;
+    fill([g.time fliplr(g.time)]', [a ; flipud(b)],[.8 .8 .8],'EdgeColor','none')
+    a=reshape(g.dens_sig(i_lat(ill),i_lon(ill),:,3),[],1); a(isnan(a))=0;
+    b=reshape(g.dens_sig(i_lat(ill),i_lon(ill),:,5),[],1); b(isnan(b))=0;
+    fill([g.time fliplr(g.time)]', [a ; flipud(b)],[.7 .7 .7],'EdgeColor','none')
+    plot(g.time,reshape(g.dens_sig(i_lat(ill),i_lon(ill),:,4),[],1),'k');
+    for it=1:numel(i_t)
+        plot([(g.time(i_t(it))) (g.time(i_t(it)))], [0 ymax(ill)],'k','linewidth',2)
+    end
+    xlabel('Date'); ylabel('Bird density'); axis tight; 
+    ylim([0 ymax(ill)]); box on; 
+    %set(gca,'YScale','log')
+end
 
 
 % export_fig 'figure/paper/estimation2.eps' -eps
@@ -337,21 +387,7 @@ end
 
 
 
-%% Stats Radars
 
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-plotm(coastlat, coastlon,'k');
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-scatterm([dc.lat],[dc.lon],[dc.maxrange]*8,[dc.maxrange],'filled','MarkerEdgeColor','k');
-c=colorbar; c.Label.String='Max range radius of radar';
-
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-plotm(coastlat, coastlon,'k');
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-scatterm([dc.lat],[dc.lon],100,sum(bsxfun(@eq,data.i_r,1:69)),'filled','MarkerEdgeColor','k');
-c=colorbar; c.Label.String='Number of datum per radar';
 
 
 
