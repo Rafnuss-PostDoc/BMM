@@ -32,7 +32,7 @@ for i_d=1:numel(d)
         filename = [d(i_d).name, strrep(d(i_d).date(i_dd,:),'-','')];
         
         % Download all the available file and unzip them
-        if exist(['data/' filename  '.zip'], 'file') ~= 2
+        if exist(['data/' filename], 'dir') ~= 7
             try
                 path = ['https://lw-enram.s3-eu-west-1.amazonaws.com/', d(i_d).name(1:2), '/', d(i_d).name(3:5), '/', extractBefore(d(i_d).date(i_dd,:),'-'), '/' ];
                 websave(['data/' filename  '.zip'],[path filename '.zip'])

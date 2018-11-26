@@ -51,9 +51,9 @@ Direction does not present a noctural fluctuation and thus a single variable can
 
 | 					| Density [bird/m<sup>2<(sup>] | Mean Flight Speed [m/s]  |Mean Flight Direction [deg] |
 | ------------- 	| ------------- 	 | ------------- | ------------- |
-|  Model Inference/Cross-validation 	|   [code](https://raphael-nussbaumer-phd.github.io/BMM/html/Density_modelInf_crossValid) |  [code](https://raphael-nussbaumer-phd.github.io/BMM/html/FlightSpeed_modelInf_corssValid)  |  [code](https://raphael-nussbaumer-phd.github.io/BMM/html/FlightDir_modelInf_corssValid)  |
-|  Estimation Map 	|  <img src="figure/Density_estimationMap_reassamble.gif"> [code](https://raphael-nussbaumer-phd.github.io/BMM/html/Density_estimationMap) | <img src="figure/FlightSpeed_estimationMap_reassemble.gif">[code](https://raphael-nussbaumer-phd.github.io/BMM/html/FlightSpeed_estimationMap)  | <img src="figure/FlightDir_estimationMap_reassemble.gif"> [code](https://raphael-nussbaumer-phd.github.io/BMM/html/FlightDir_estimationMap)  |
-|  Simulation Map 	| <img src="figure/Density_simulationMap_reassemble.gif">  [code](https://raphael-nussbaumer-phd.github.io/BMM/html/) | <img src="figure/FlightSpeed_simulationMap_reassemble.gif"> [code](https://raphael-nussbaumer-phd.github.io/BMM/html/)  | <img src="figure/FlightDir_simulationMap_reassemble.gif"> [code](https://raphael-nussbaumer-phd.github.io/BMM/html/)  |
+|  Model Inference/Cross-validation 	|   [code](https://rafnuss-phd.github.io/BMM/html/Density_modelInf_crossValid) |  [code](https://rafnuss-phd.github.io/BMM/html/FlightSpeed_modelInf_corssValid)  |  [code](https://rafnuss-phd.github.io/BMM/html/FlightDir_modelInf_corssValid)  |
+|  Estimation Map 	|  <img src="figure/Density_estimationMap_reassamble.gif"> [code](https://rafnuss-phd.github.io/BMM/html/Density_estimationMap) | <img src="figure/FlightSpeed_estimationMap_reassemble.gif">[code](https://rafnuss-phd.github.io/BMM/html/FlightSpeed_estimationMap)  | <img src="figure/FlightDir_estimationMap_reassemble.gif"> [code](https://rafnuss-phd.github.io/BMM/html/FlightDir_estimationMap)  |
+|  Simulation Map 	| <img src="figure/Density_simulationMap_reassemble.gif">  [code](https://rafnuss-phd.github.io/BMM/html/) | <img src="figure/FlightSpeed_simulationMap_reassemble.gif"> [code](https://rafnuss-phd.github.io/BMM/html/)  | <img src="figure/FlightDir_simulationMap_reassemble.gif"> [code](https://rafnuss-phd.github.io/BMM/html/)  |
 
 
 
@@ -63,7 +63,7 @@ Direction does not present a noctural fluctuation and thus a single variable can
 
 **Other**
 
-* [Data exploration MATLAB](https://raphael-nussbaumer-phd.github.io/BMM/html/Data_Exploration)
-* [Simple interpolation](https://raphael-nussbaumer-phd.github.io/BMM/html/interpolationSimple)
+* [Data exploration MATLAB](https://rafnuss-phd.github.io/BMM/html/Data_Exploration)
+* [Simple interpolation](https://rafnuss-phd.github.io/BMM/html/interpolationSimple)
 
 
