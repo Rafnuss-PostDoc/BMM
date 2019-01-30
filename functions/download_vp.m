@@ -18,12 +18,13 @@ for i_d=1:numel(d)
 end
 
 
-for i_d=1:numel(d)
+for i_d=23:numel(d)
     
     d(i_d).time = [];d(i_d).stime = [];d(i_d).etime = [];
     for i_quantity = 1:numel(quantity)
         d(i_d).(quantity{i_quantity}) = [];
     end
+    
     
     d(i_d).levels=nan(size(d(i_d).date,1),1);
 
@@ -32,18 +33,18 @@ for i_d=1:numel(d)
         filename = [d(i_d).name, strrep(d(i_d).date(i_dd,:),'-','')];
         
         % Download all the available file and unzip them
-        if exist(['data/' filename], 'dir') ~= 7
-            try
-                path = ['https://lw-enram.s3-eu-west-1.amazonaws.com/', d(i_d).name(1:2), '/', d(i_d).name(3:5), '/', extractBefore(d(i_d).date(i_dd,:),'-'), '/' ];
-                websave(['data/' filename  '.zip'],[path filename '.zip'])
-                unzip(['data/' filename  '.zip'],['data/' filename '/'])
-            catch
-                disp(filename)
-            end
-        end
+%         if exist(['C:\Users\rnussba1\Documents\BMM\data\' filename], 'dir') ~= 7
+%             try
+%                 path = ['https://lw-enram.s3-eu-west-1.amazonaws.com/', d(i_d).name(1:2), '/', d(i_d).name(3:5), '/', extractBefore(d(i_d).date(i_dd,:),'-'), '/' ];
+%                 websave(['C:\Users\rnussba1\Documents\BMM\data\' filename  '.zip'],[path filename '.zip'])
+%                 unzip(['C:\Users\rnussba1\Documents\BMM\data\' filename  '.zip'],['C:\Users\rnussba1\Documents\BMM\data\' filename '/'])
+%             catch
+%                 disp(filename)
+%             end
+%         end
 
         % Get all the individual h5 files 
-        files = dir(['data/', filename, '/**/*.h5']);
+        files = dir(['C:\Users\rnussba1\Documents\BMM\data\', filename, '\**\*.h5']);
         
         % Filter date out of range
         if numel(files)>0
