@@ -1,10 +1,10 @@
 
 
-% folder ='Density_estimationMap_ImageOverlay/';
-% load('data/Density_estimationMap','g')
-% data = log(g.dens_est);
-% min_d=-2;
-% max_d=5;
+folder ='Density_estimationMap_ImageOverlay/';
+load('data/Density_estimationMap','g')
+data = log(g.dens_est);
+min_d=-2;
+max_d=5;
 
 % folder ='Density_simulationMap_ImageOverlay/';
 % load('data/Density_simulationMap_reassemble','real_dens')
