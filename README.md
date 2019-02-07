@@ -1,8 +1,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 With Bird Migration Modelling (BMM), we are working toward using classical geostatistical method (e.g. kriging) to estimate the european nocturnal migration of bird with weather radar.
 ## Demo
-[<img src="figure/screenshot.PNG">
-Test the demo](https://zoziologie.raphaelnussbaumer.com/bmm-map/)
+[<img src="2016/figure/screenshot.PNG">
+Test the demo](https://bmm.raphaelnussbaumer.com/)
 
 ## Data
 The data used in this study are found on the repository of [European Network for the Radar surveillance of Animal Movement (ENRAM)](http://enram.github.io/data-repository/). See also [vol2bird](https://github.com/adokter/vol2bird) for the processing of the row data.
@@ -16,17 +16,16 @@ The model we proposed is the following,
 $$Z{\left(\bf{s},t\right)^p}=t\left(\bf{s}\right)+A\left(\bf{s},t\right)+c\left(t\right)+R\left(\bf{s},t\right)$$
 
 where the power-$$p$$ transform of the bird density $$Z$$ over time $$t$$ and space $$\bf{s}$$ is decomposed into several term:
-* $$t\left(\bf{s}\right)$$: a spatialized planar trend.
+* $$t\left(\bf{s}\right)$$: a static spatial planar trend.
 * $$A\left(\bf{s},t\right)$$: a daily spatialized amplitude.
 * $$c\left(\bf{s},t\right)$$: a bell-shape curve explaining the variation during the night, fixed for all nights and all places.
-* $$R\left(\bf{s},t\right)$$: a residual term
+* $$R\left(\bf{s},t\right)$$: a residual term accounting for sub-daily fluctuations.
 
 <img src="figure/paper/mathematical_model_2.png">
 
 | Trend  | Amplitude | Curve  | Residual |
 | ------------- | ------------- | ------------- | ------------- |
-|  <img src="figure/trend.png"> | <img src="figure/Density_estimationMap_amplitude.gif">  | <img src="figure/curve.png">  | <img src="figure/Density_estimationMap_residu.gif">  |
-
+|  <img src="2016/figure/trend.png"> | <img src="2016/figure/Density_estimationMap_amplitude.gif">  | <img src="2016/figure/curve.png">  | <img src="2016/figure/Density_estimationMap_residu.gif">  |
 
 
 Modelisation is perform as such
@@ -35,35 +34,23 @@ Modelisation is perform as such
 3. The amplitude is transformed with a normal score and then, a Gneiting covariance model is fitted to the data.
 4. Similarly to the amplitude, the residual (data minus model fitted in 2.) is also transform into a Gaussian variable and another Gneiting covariance function is fitted. 
 
-Estimation and simulation are possible by computing each componenent of the model separatly and reassemble them. The two Gaussian process (amplitude and residu) are estimated/simulated using kriging and Sequential Gaussian Simulation. 
+Estimation and simulation are possible by computing each componenent of the model separatly and reassemble them. The two Gaussian process (amplitude and residu) are estimated/simulated using Kriging. 
 
-Cross-validation is performed for each radar by ignoring the data of this radar for all time and estimating the bird density at the same location and time. This allows to validate the model and its performance.
+Validation is performed by (1) Cross-validation for each radar by ignoring the data of this radar for all time and estimating the bird density at the same location and time and (2) comparaison to Birdscan radars.
 
-### Mean Flight Speed [m/s]
-Bird flight speed is model with the same framework as the density.
+code: [MATLAB LiveScript](https://rafnuss-postdoc.github.io/BMM/2016/html/Density_inference_cross-validation)
 
+### Flight Speed and Direction [m/s]
+Bird flight (speed and direction) is modeled by its two componants (south-north and east-west). The resulting vectoriel field can be assumed stationary and thus, does not requires the same complex decomposition as bird density, but only a transformation ([LambertW](https://arxiv.org/abs/1010.2265)). As the cross-covariance was relatively small (~2x smaller than each covariance) and because both componants are always known, the kriging was done separatly for each one.   
 
-### Mean Flight Direction [deg]
-Direction does not present a noctural fluctuation and thus a single variable can be modeled directly. Because of the angular nature of orientation, distance were computed using the closest angle between direction, the model variable was centered around the mean direction (220°) and ordinary kriging was used to correct for the variation in the mean direction.  
+code: [MATLAB](https://rafnuss-postdoc.github.io/BMM/2016/html/Flight_inference_cross-validation)
 
 
 ## Result
 
-| 					| Density [bird/m<sup>2<(sup>] | Mean Flight Speed [m/s]  |Mean Flight Direction [deg] |
-| ------------- 	| ------------- 	 | ------------- | ------------- |
-|  Model Inference/Cross-validation 	|   [code](https://rafnuss-phd.github.io/BMM/html/Density_modelInf_crossValid) |  [code](https://rafnuss-phd.github.io/BMM/html/FlightSpeed_modelInf_corssValid)  |  [code](https://rafnuss-phd.github.io/BMM/html/FlightDir_modelInf_corssValid)  |
-|  Estimation Map 	|  <img src="figure/Density_estimationMap_reassamble.gif"> [code](https://rafnuss-phd.github.io/BMM/html/Density_estimationMap) | <img src="figure/FlightSpeed_estimationMap_reassemble.gif">[code](https://rafnuss-phd.github.io/BMM/html/FlightSpeed_estimationMap)  | <img src="figure/FlightDir_estimationMap_reassemble.gif"> [code](https://rafnuss-phd.github.io/BMM/html/FlightDir_estimationMap)  |
-|  Simulation Map 	| <img src="figure/Density_simulationMap_reassemble.gif">  [code](https://rafnuss-phd.github.io/BMM/html/) | <img src="figure/FlightSpeed_simulationMap_reassemble.gif"> [code](https://rafnuss-phd.github.io/BMM/html/)  | <img src="figure/FlightDir_simulationMap_reassemble.gif"> [code](https://rafnuss-phd.github.io/BMM/html/)  |
+| 					| Density [bird/m<sup>2<(sup>] | Flight |
+| ------------- 	| ------------- 	 | ------------- |
+|  Estimation Map 	|  <img src="2016/figure/Density_estimationMap_reassamble.gif"> [code](https://rafnuss-postdoc.github.io/BMM/2016/html/Density_estimation-map) | <img src="2016/figure/Flight_estimationMap.gif"> [code](https://rafnuss-postdoc.github.io/BMM/2016/html/Flight_estimation-map)  |
 
-
-
-
-
-
-
-**Other**
-
-* [Data exploration MATLAB](https://rafnuss-phd.github.io/BMM/html/Data_Exploration)
-* [Simple interpolation](https://rafnuss-phd.github.io/BMM/html/interpolationSimple)
 
 
