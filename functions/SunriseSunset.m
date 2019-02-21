@@ -21,18 +21,19 @@ save('data/sunrisesunset.mat','time','data')
 % Grid 
 lat_d=43:68; lat_d(lat_d==0)=0.0000001;
 lon_d=-5:30;lon_d(lon_d==0)=0.0000001;
-tim_d = start_date-1:end_date-1;
+tim_d = start_date-1/2:end_date+1/2;
 [LAT,LON,TIM]=ndgrid(lat_d,lon_d,tim_d);
 
 sunrs_e=nan(numel(lat_d),numel(lon_d),numel(tim_d));
 sunrs_b=nan(numel(lat_d),numel(lon_d),numel(tim_d));
-for i_lat=16:5:numel(lat_d)
+for i_lat=1:5:numel(lat_d)
     for i_lon=1:5:numel(lon_d)
         for i_t=1:5:numel(tim_d)
-            dd = webread(['https://api.sunrise-sunset.org/json?lat=' num2str(lat_d(i_lat)) '&lng=' num2str(lon_d(i_lon)) '&date=' datestr(tim_d(i_t),'yyyy-mm-dd')]);
-            sunrs_b(i_lat,i_lon,i_t) =  datenum(string(dd.results.civil_twilight_begin));
-            sunrs_e(i_lat,i_lon,i_t) =  datenum(string(dd.results.civil_twilight_end));
-            pause(5)
+%             dd = webread(['https://api.sunrise-sunset.org/json?lat=' num2str(lat_d(i_lat)) '&lng=' num2str(lon_d(i_lon)) '&date=' datestr(tim_d(i_t),'yyyy-mm-dd')]);
+%             assert(strcmp(dd.status,'OK'))
+            sunrs_b(i_lat,i_lon,i_t) = a(i_lat,i_lon,i_t);% datenum(string(dd.results.civil_twilight_begin));
+            sunrs_e(i_lat,i_lon,i_t) = b(i_lat,i_lon,i_t);% datenum(string(dd.results.civil_twilight_end));
+            % pause(5)
         end
     end
 end
@@ -48,8 +49,8 @@ sunrs_b=F(LAT,LON,datenum(TIM));
 sunrs_b = repmat(reshape(datenum(tim_d-1/2),1,1,[]),size(sunrs_b,1),size(sunrs_b,2),1)+sunrs_b-datenum('01-01-2018');
 sunrs_e = repmat(reshape(datenum(tim_d-1/2),1,1,[]),size(sunrs_e,1),size(sunrs_e,2),1)+sunrs_e-datenum('01-01-2018');
 
-save('data/sunrisesunset_grid.mat','lat_d','lon_d','tim_d','sunrs_e','sunrs_b')
-
+save('./data/sunrisesunset_grid.mat','lat_d','lon_d','tim_d','sunrs_e','sunrs_b')
+% load('./data/sunrisesunset_grid.mat')
 end
 
 

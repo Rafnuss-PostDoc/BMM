@@ -1,32 +1,111 @@
-
-load('data/Density_estimationMap' ,'g');
+load('data/Flight_estimationMap');
+load('data/Density_estimationMap');
+load('data/Density_modelInf.mat','pow_a')
+addpath('../functions/')
 
 dlat = lldistkm([g.lat(1) g.lon(1)],[g.lat(2) g.lon(1)]);
 dlon = lldistkm([g.lat2D(:,1) g.lon2D(:,1)],[g.lat2D(:,1) g.lon2D(:,2)]);
-area = repmat(dlon*dlat,1,g.nlon,2017);
-area( repmat(~g.mask_water | ~g.mask_distrad,1,1,2017))=nan;
+area = repmat(dlon*dlat,1,g.nlon);
+area( ~g.mask_water | ~g.mask_distrad)=nan;
+area = repmat(area,1,1,g.nt);
+area(~g.mask_rain)=nan;
 
+g_dens_est=gd.dens_est;
+g_dens_est(~g.mask_rain)=nan;
+g_dens_q10=gd.dens_q10;
+g_dens_q10(~g.mask_rain)=nan;
+g_dens_q90=gd.dens_q90;
+g_dens_q90(~g.mask_rain)=nan;
 
+a = reshape(nansum(nansum(area,1),2),g.nt,[]);
+est = reshape( nansum( nansum( g_dens_est .* area ,1) ,2),[],1) ./ a;
+idt=est~=0;
+idt(idt==0 & ([idt(2:end);1]==1 | [1;idt(1:end-1)]==1))=1; % Adding a buffer of 1.
+idt = find(idt);
+sig = sqrt(reshape( nansum( nansum( g_dens_q10(:,:,idt).^2 .* area(:,:,idt) ,1) ,2),[],1) ./ a(idt));
+
+         
+
+dd=2;
 i=1;
-json = struct();
-for i_lat=1:5:g.nlat
-    for i_lon=1:5:g.nlon
-        est = reshape(g.dens_est(i_lat,i_lon,:),g.nt,[]);
-        if ~(all(isnan(est)))
-            json(i).t = find(~isnan(est));
-            json(i).est = round(est(json(i).t),2); 
-            json(i).q10 = round(reshape(g.dens_q10(i_lat,i_lon,(json(i).t)),1,[]),2); 
-            json(i).q90 = round(reshape(g.dens_q90(i_lat,i_lon,(json(i).t)),1,[]),2); 
-            json(i).lat = g.lat(i_lat);
-            json(i).lon = g.lon(i_lon);
-            json(i).area=area(i_lat,i_lon);
+density=nan(numel(idt),3,g.nlm);
+uv=nan(numel(idt),2,g.nlm);
+
+latlon=nan(3,g.nlm);
+for i_lat=1:dd:g.nlat-dd
+    for i_lon=1:dd:g.nlon-dd
+        if any(g.latlonmask(i_lat+(0:dd-1),i_lon+(0:dd-1)))
+            surface=max(reshape(nansum(nansum(area(i_lat+(0:dd-1),i_lon+(0:dd-1),idt),1),2),[],1));
+            latlon(:,i) = round([mean(g.lat(i_lat+(0:dd-1))) mean(g.lon(i_lon+(0:dd-1))) surface],2);
+            
+            density(:,1,i) = reshape( nanmean(nanmean( g_dens_est(i_lat+(0:dd-1),i_lon+(0:dd-1),idt),1),2),[],1);
+            density(:,2,i) = reshape( nanmean(nanmean( g_dens_q10(i_lat+(0:dd-1),i_lon+(0:dd-1),idt),1),2),[],1);
+            density(:,3,i) = reshape( nanmean(nanmean( g_dens_q90(i_lat+(0:dd-1),i_lon+(0:dd-1),idt),1),2),[],1);
+            
+            uv(:,1,i) = reshape( nanmean(nanmean( guv.u_est(i_lat+(0:dd-1),i_lon+(0:dd-1),idt),1),2),[],1);
+            uv(:,2,i) = reshape( nanmean(nanmean( guv.v_est(i_lat+(0:dd-1),i_lon+(0:dd-1),idt),1),2),[],1);
+            
             i=i+1;
         end
     end
 end
+density=density(:,:,1:i-1);
+density(isnan(density))=0;
+uv=uv(:,:,1:i-1);
+uv(isnan(uv))=0;
+latlon=latlon(:,1:i-1);
 
-fileID = fopen('figure/exportDensityGrid.json','w');
-fprintf(fileID,jsonencode({g.time,json}));
+% fileID = fopen('BMM_web/exportDensityGrid.json','w');
+% fprintf(fileID,jsonencode({latlon',round(permute(density,[3,2,1]),2),round(all_Density',2)}));
+% fclose(fileID);
+
+fileID = fopen('BMM_web/exportGrid_time.json','w');
+fprintf(fileID,jsonencode({datestr(g.time(idt),'yyyy-mm-dd HH:MM')}));
+fclose(fileID);
+
+fileID = fopen('BMM_web/exportGrid_grid.json','w');
+fprintf(fileID,jsonencode({latlon'}));
+fclose(fileID);
+
+fileID = fopen('BMM_web/exportGrid_density_all.json','w');
+fprintf(fileID,jsonencode({round(all_Density',2)}));
+fclose(fileID);
+
+fileID = fopen('BMM_web/exportGrid_density.json','w');
+fprintf(fileID,jsonencode({round(round(permute(density,[3,2,1]),2),2)}));
+fclose(fileID);
+
+fileID = fopen('BMM_web/exportGrid_UV.json','w');
+fprintf(fileID,jsonencode({round(permute(uv,[3,1,2]),2)}));
+fclose(fileID);
+
+%% Mangodb
+clear d
+for i=1:size(density,3)
+    d(i).density.est = round(density(:,1,i),2);
+    d(i).density.q10 = round(density(:,2,i),2);
+    d(i).density.q90 = round(density(:,3,i),2);
+    d(i).u = round(uv(:,1,i),2);
+    d(i).v = round(uv(:,2,i),2);
+    d(i).id = i;
+end
+str = jsonencode(d);
+str=strrep(str(2:end-1),'},{','}\n{');
+str=strrep(str,'id','_id');
+fileID = fopen('BMM_web/exportGrid_mongodb.json','w');
+fprintf(fileID,str);
+fclose(fileID);
+
+dall.density.est = (density(:,1,:))
+
+%% Binary
+
+fileID = fopen('BMM_web/exportDensityGrid.bin','w');
+fwrite(fileID,cat(3,density,all_Density),'single');
+fclose(fileID);
+
+fileID = fopen('BMM_web/exportDensityGrid_latlon_time.json','w');
+fprintf(fileID,jsonencode({latlon, datestr(g.time(idt),'yyyy-mm-dd HH:MM')}));
 fclose(fileID);
 
 %% OLD NOT USED

@@ -2,6 +2,7 @@
 */data/*
 *.mat
 *.m~
+2016/BMM_web/*
 
 # Windows image file caches
 Thumbs.db

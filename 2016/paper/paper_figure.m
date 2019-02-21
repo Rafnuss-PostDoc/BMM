@@ -324,16 +324,20 @@ legend('Uncertainty range','Estimate Z^*','Observed data')
 
 %% Figure Result: point
 ix=35; iy=74;
-ep1 = reshape(( g.denstrans_est(ix,iy,:)+norminv(.1).*g.denstrans_sig(ix,iy,:) ).^(1/pow_a),1,[]);
-em1 = reshape(( g.denstrans_est(ix,iy,:)+norminv(.9).*g.denstrans_sig(ix,iy,:) ).^(1/pow_a),1,[]);
+ep1 = reshape(g.dens_q10(ix,iy,:),1,[]);
+em1 = reshape(g.dens_q90(ix,iy,:),1,[]);
 ep1(isnan(ep1))=0;
 em1(isnan(em1))=0;
 
 figure('position',[0 0 1000 400]); hold on
-fill([g.time fliplr(g.time)]', [em1' ; flipud(ep1')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5);
-plot(g.time,reshape(g.dens_est(ix,iy,:),1,[]),'k','linewidth',2);
-xlim([start_date end_date]);xlabel('Date'); ylabel('Bird density [bird/km^2]'); box on
-legend('Uncertainty range','Estimate Z^*','Observed data')
+fill(datenum([g.time fliplr(g.time)]'), [em1' ; flipud(ep1')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5);
+plot(datenum(g.time),reshape(g.dens_est(ix,iy,:),1,[]),'k','linewidth',2);
+
+a=reshape(g.mask_rain(ix,iy,:),1,[]);
+imagesc(datenum(g.time),[0 200],[a;a],'AlphaData',~[a;a])
+
+datetick('x','dd mmm','keeplimits','keepticks'); axis tight; ylim([0 max(em1)]); xlabel('Date'); ylabel('Bird density [bird/km^2]'); box on; 
+legend('Uncertainty range','Estimate Z^*','rain')
 
 
 
@@ -343,15 +347,20 @@ dlat = lldistkm([g.lat(1) g.lon(1)],[g.lat(2) g.lon(1)]);
 dlon = lldistkm([g.lat2D(:,1) g.lon2D(:,1)],[g.lat2D(:,1) g.lon2D(:,2)]);
 area = repmat(dlon*dlat,1,g.nlon,2017);
 area( repmat(~g.mask_water | ~g.mask_distrad,1,1,2017))=nan;
+area(~g.mask_rain)=nan;
 
-g_denstrans_est=g.denstrans_est;
-g_denstrans_est(~g.mask_rain) = nan;
-g_dens_est = g_denstrans_est.^(1/pow_a);
+g_denstrans_est =g.denstrans_est;
+g_denstrans_est(~g.mask_rain)=nan;
+g_denstrans_sig=g.denstrans_sig;
+g_denstrans_sig(~g.mask_rain)=nan;
 
-g_dens_mean = nanmean( g_dens_est ,3);
-g_dens_sum = reshape( nansum( nansum( g_dens_est .* area ,1) ,2), 1, g.nt);
-g_dens_p10_sum = reshape( nansum( nansum( (g_denstrans_est+norminv(.1).*g.denstrans_sig).^(1/pow_a) .* area ,1) ,2), 1, g.nt);
-g_dens_p90_sum = reshape( nansum( nansum( (g_denstrans_est+norminv(.9).*g.denstrans_sig).^(1/pow_a) .* area ,1) ,2), 1, g.nt);
+w = area/nansum(area(:));
+est = reshape( nansum( nansum( g_denstrans_est .* w ,1) ,2),[],1);
+sig = sqrt(reshape( nansum( nansum( g_denstrans_sig.^2 .* (w.^2) ,1) ,2),[],1));
+g_dens_sum = (est .^ (1/pow_a)) * nansum(area(:));
+g_dens_q10_sum = ((est+norminv(.1).*sig) .^ (1/pow_a)) * nansum(area(:));
+g_dens_q90_sum = ((est+norminv(.9).*sig) .^ (1/pow_a)) * nansum(area(:));
+
 
 figure('position',[0 0 1000 400]); 
 worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
@@ -359,10 +368,10 @@ worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);
 geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
 geoshow('worldrivers.shp','Color', 'blue')
 surfm(g.lat2D,g.lon2D,g_dens_mean);
-colorbar()
+colorbar();caxis([0 50])
 
 figure('position',[0 0 1000 400]);   hold on;
-fill([g.time fliplr(g.time)]', [g_dens_p10_sum' ; flipud(g_dens_p90_sum')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5)
+fill([g.time fliplr(g.time)]', [g_dens_q10_sum ; flipud(g_dens_q90_sum)],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5)
 a=g_dens_sum; a(a==0)=nan;
 plot(g.time,a,'k','linewidth',2);
 xlabel('Date'); ylabel('Total number of bird'); box on
@@ -386,37 +395,34 @@ l ={fr,de,ch,nl,se,pl,be,fi,cz};
 
 dlat = lldistkm([g.lat(1) g.lon(1)],[g.lat(2) g.lon(1)]);
 dlon = lldistkm([g.lat2D(:,1) g.lon2D(:,1)],[g.lat2D(:,1) g.lon2D(:,2)]);
-area = repmat(dlon*dlat,1,g.nlon);
+area = repmat(dlon*dlat,1,g.nlon,2017);
+area( repmat(~g.mask_water | ~g.mask_distrad,1,1,2017))=nan;
+area(~g.mask_rain)=0;
+
 g_denstrans_est=g.denstrans_est;
 g_denstrans_est(~g.mask_rain) = nan;
-g_dens_est = g_denstrans_est.^(1/pow_a);
+g_denstrans_est = g_denstrans_est.^(1/pow_a);
 g_dens_p10 = (g_denstrans_est+norminv(.1).*g.denstrans_sig).^(1/pow_a);
 g_dens_p90 = (g_denstrans_est+norminv(.9).*g.denstrans_sig).^(1/pow_a);
 
-
-figure('position',[0 0 1000 400]);  hold on
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-plotm(g.lat2D(in), g.lon2D(in),'.');
-
 l_dens_est_avg=nan(numel(l),g.nt);
-l_dens_p10_avg=l_dens_est_avg;
-l_dens_p90_avg=l_dens_est_avg;
+l_dens_q10_avg=l_dens_est_avg;
+l_dens_q90_avg=l_dens_est_avg;
 
 for i_l=1:numel(l)
-    in = inpolygon(g.lat2D,g.lon2D,l{i_l}(:,2),l{i_l}(:,1));
-    l_dens_est_avg(i_l,:)=nansum(reshape(g_dens_est(repmat(in,1,1,g.nt)),[],g.nt) .* repmat(area(in),1,g.nt),1); %  / sum(area(in)
-    l_dens_p10_avg(i_l,:)=nansum(reshape(g_dens_p10(repmat(in,1,1,g.nt)),[],g.nt) .* repmat(area(in),1,g.nt),1);
-    l_dens_p90_avg(i_l,:)=nansum(reshape(g_dens_p90(repmat(in,1,1,g.nt)),[],g.nt) .* repmat(area(in),1,g.nt),1);
+    in = repmat(inpolygon(g.lat2D,g.lon2D,l{i_l}(:,2),l{i_l}(:,1)),1,1,g.nt);
+    l_dens_est_avg(i_l,:)=nansum(reshape(g.dens_est(in),[],g.nt) .* reshape(area(in),[],g.nt),1); %  / sum(area(in)
+    l_dens_q10_avg(i_l,:)=nansum(reshape(g.dens_q10(in),[],g.nt) .* reshape(area(in),[],g.nt),1);
+    l_dens_q90_avg(i_l,:)=nansum(reshape(g.dens_q90(in),[],g.nt) .* reshape(area(in),[],g.nt),1);
 end
+
 
 % plot(l_dens_est_avg')
 % legend('fr','de','ch','nl','se','pl','be','fi','cz')
 
 figure('position',[0 0 1000 400]);   hold on;
 i_l=1;
-fill([g.time fliplr(g.time)]', [l_dens_p10_avg(i_l,:)' ; flipud(l_dens_p90_avg(i_l,:)')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5)
+fill([g.time fliplr(g.time)]', [l_dens_q10_avg(i_l,:)' ; flipud(l_dens_q90_avg(i_l,:)')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5)
 a=l_dens_est_avg(i_l,:); a(a==0)=nan;
 plot(g.time,a,'k','linewidth',2);
 % i_l=2;
@@ -425,6 +431,13 @@ plot(g.time,a,'k','linewidth',2);
 plot(g.time,a,'k','linewidth',2);
 xlabel('Date'); ylabel('Total number of bird'); box on
 axis tight
+
+figure('position',[0 0 1000 400]);  hold on
+worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
+geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+geoshow('worldrivers.shp','Color', 'blue')
+plotm(g.lat2D(in), g.lon2D(in),'.');
+
 
 %%
 
@@ -570,12 +583,12 @@ end
 
 
 %% Figure Result: Daily average
-g_dens_est=g.dens_est;
-g_dens_est(~g.mask_rain)=nan;
+g_denstrans_est=g.dens_est;
+g_denstrans_est(~g.mask_rain)=nan;
 g_dens_a_avg = nan(g.nlat,g.nlon,g.nat-1);
 
 for i_at=1:g.nat-1
-   g_dens_a_avg(:,:,i_at) = nanmean(g_dens_est(:,:,((i_at-1)*4*24+1):(i_at*4*24)),3);
+   g_dens_a_avg(:,:,i_at) = nanmean(g_denstrans_est(:,:,((i_at-1)*4*24+1):(i_at*4*24)),3);
 end
 
 figure('position',[0 0 1400 1400]); hold on;
