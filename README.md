@@ -1,10 +1,9 @@
-With Bird Migration Modelling (BMM), we are working toward using classical geostatistical method (e.g. kriging) to estimate the european nocturnal migration of bird with weather radar.
-## Demo
-[<img src="2016/figure/screenshot.PNG">
-Test the demo](https://bmm.raphaelnussbaumer.com/)
+## In short
+With Bird Migration Modelling (BMM), we are working toward using classical geostatistical method (i.e. Kriging) to estimate the european nocturnal migration of bird across europe based on data measured with weather radar.
 
-## Data
-The data used in this study are found on the repository of [European Network for the Radar surveillance of Animal Movement (ENRAM)](http://enram.github.io/data-repository/). See also [vol2bird](https://github.com/adokter/vol2bird) for the processing of the row data.
+## Demo
+[<img src="2016/figure/screenshot.PNG">](https://bmm.raphaelnussbaumer.com/)
+
 
 ## Methodolgy
 
@@ -44,6 +43,9 @@ Bird flight (speed and direction) is modeled by its two componants (south-north 
 
 code: [MATLAB](https://rafnuss-postdoc.github.io/BMM/2016/html/Flight_inference_cross-validation)
 
+## Data
+The data used in this study are found on the repository of [European Network for the Radar surveillance of Animal Movement (ENRAM)](http://enram.github.io/data-repository/). See also [vol2bird](https://github.com/adokter/vol2bird) for the processing of the row data.
+
 
 ## Result
 
@@ -52,5 +54,9 @@ code: [MATLAB](https://rafnuss-postdoc.github.io/BMM/2016/html/Flight_inference_
 |  Estimation Map 	|  <img src="2016/figure/Density_estimationMap_reassamble.gif">  | <img src="2016/figure/Flight_estimationMap_reassamble.gif">  |
 | Simulation Map    |  <img src="2016/figure/Density_simulationMap.gif"> | <img src="2016/figure/Flight_simulationMap.gif"> |
 
+
+## Read more
+
+I'll be updating [this projet on reasearchgate](https://www.researchgate.net/project/Bird-Migration-Modelling-BMM) with conference presentations and articles.
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
