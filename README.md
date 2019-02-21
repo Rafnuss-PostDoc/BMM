@@ -1,4 +1,3 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 With Bird Migration Modelling (BMM), we are working toward using classical geostatistical method (e.g. kriging) to estimate the european nocturnal migration of bird with weather radar.
 ## Demo
 [<img src="2016/figure/screenshot.PNG">
@@ -53,4 +52,4 @@ code: [MATLAB](https://rafnuss-postdoc.github.io/BMM/2016/html/Flight_inference_
 |  Estimation Map 	|  <img src="2016/figure/Density_estimationMap_reassamble.gif"> [code](https://rafnuss-postdoc.github.io/BMM/2016/html/Density_estimation-map) | <img src="2016/figure/Flight_estimationMap.gif"> [code](https://rafnuss-postdoc.github.io/BMM/2016/html/Flight_estimation-map)  |
 
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
