@@ -19,7 +19,7 @@ where the power-$$p$$ transform of the bird density $$Z$$ over time $$t$$ and sp
 * $$c\left(\bf{s},t\right)$$: a bell-shape curve explaining the variation during the night, fixed for all nights and all places.
 * $$R\left(\bf{s},t\right)$$: a residual term accounting for sub-daily fluctuations.
 
-<img src="2016/figure/paper/mathematical_model_2.png">
+<img src="2016/figure/paper/figure/mathematical_model_2.png">
 
 | Trend  | Amplitude | Curve  | Residual |
 | ------------- | ------------- | ------------- | ------------- |
