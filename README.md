@@ -20,7 +20,7 @@ where the power-$$p$$ transform of the bird density $$Z$$ over time $$t$$ and sp
 * $$c\left(\bf{s},t\right)$$: a bell-shape curve explaining the variation during the night, fixed for all nights and all places.
 * $$R\left(\bf{s},t\right)$$: a residual term accounting for sub-daily fluctuations.
 
-<img src="figure/paper/mathematical_model_2.png">
+<img src="2016/figure/paper/mathematical_model_2.png">
 
 | Trend  | Amplitude | Curve  | Residual |
 | ------------- | ------------- | ------------- | ------------- |
@@ -47,9 +47,10 @@ code: [MATLAB](https://rafnuss-postdoc.github.io/BMM/2016/html/Flight_inference_
 
 ## Result
 
-| 					| Density [bird/m<sup>2<(sup>] | Flight |
+| 					| Density [bird/m<sup>2</sup>] | Flight |
 | ------------- 	| ------------- 	 | ------------- |
-|  Estimation Map 	|  <img src="2016/figure/Density_estimationMap_reassamble.gif"> [code](https://rafnuss-postdoc.github.io/BMM/2016/html/Density_estimation-map) | <img src="2016/figure/Flight_estimationMap.gif"> [code](https://rafnuss-postdoc.github.io/BMM/2016/html/Flight_estimation-map)  |
+|  Estimation Map 	|  <img src="2016/figure/Density_estimationMap_reassamble.gif">  | <img src="2016/figure/Flight_estimationMap_reassamble.gif">  |
+| Simulation Map    |  <img src="2016/figure/Density_simulationMap.gif"> | <img src="2016/figure/Flight_simulationMap.gif"> |
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
