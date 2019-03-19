@@ -1,5 +1,5 @@
 ## In short
-With Bird Migration Modelling (BMM), we are working toward using classical geostatistical method (i.e. Kriging) to estimate the european nocturnal migration of bird across europe based on data measured with weather radar.
+With Bird Migration Modelling (BMM), we use classical geostatistical methods (i.e. kriging) to quantify nocturnal bird migration across Europe based on weather radar observations.
 
 ## Demo
 [<img src="2016/figure/screenshot.PNG">](https://bmm.raphaelnussbaumer.com/)
@@ -7,13 +7,13 @@ With Bird Migration Modelling (BMM), we are working toward using classical geost
 
 ## Methodolgy
 
-### Density [bird/m<sup>2</sup>]
+### Bird density [bird/km<sup>2</sup>]
 
-The model we proposed is the following,
+The proposed model is as follows,
 
 $$Z{\left(\bf{s},t\right)^p}=t\left(\bf{s}\right)+A\left(\bf{s},t\right)+c\left(t\right)+R\left(\bf{s},t\right)$$
 
-where the power-$$p$$ transform of the bird density $$Z$$ over time $$t$$ and space $$\bf{s}$$ is decomposed into several term:
+where the power-$$p$$ transform of the bird density $$Z$$ over time $$t$$ and space $$\bf{s}$$ is decomposed into 4 components:
 * $$t\left(\bf{s}\right)$$: a static spatial planar trend.
 * $$A\left(\bf{s},t\right)$$: a daily spatialized amplitude.
 * $$c\left(\bf{s},t\right)$$: a bell-shape curve explaining the variation during the night, fixed for all nights and all places.
@@ -48,6 +48,7 @@ The data used in this study are found on the repository of [European Network for
 
 
 ## Result
+[Check the online visualization](https://bmm.raphaelnussbaumer.com/).
 
 | 					| Density [bird/m<sup>2</sup>] | Flight |
 | ------------- 	| ------------- 	 | ------------- |
