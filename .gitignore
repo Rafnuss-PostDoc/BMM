@@ -1,5 +1,6 @@
 *.asv
 */data/*
+*/BMM_web/*
 *.mat
 *.m~
 2016/BMM_web/*
