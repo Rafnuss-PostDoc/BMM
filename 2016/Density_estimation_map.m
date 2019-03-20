@@ -282,7 +282,7 @@ end
 % maxNumCompThreads('automatic');
 % parpool(maxNumCompThreads());
 
-parfor i_d=1:g.nat
+for i_d=1:g.nat
    %maxNumCompThreads(1);
     for i_l=1:g.nlm
         tmpD = gDdist_sf(data.i_r(neighday{i_d}),i_l);

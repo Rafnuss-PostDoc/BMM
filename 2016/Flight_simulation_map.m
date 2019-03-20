@@ -49,6 +49,9 @@ for i_d=1:g.nat
     Pathll{i_d}=reshape(Path(repmat(g.latlonmask,1,1,ndt{i_d})),g.nlm,ndt{i_d});
     [~,pathll{i_d}] = sort(Pathll{i_d}(:));
     pathll{i_d}=pathll{i_d}(~isinf(Pathll{i_d}(pathll{i_d})));
+    
+    Pathll{i_d}= int64(Pathll{i_d});
+    pathll{i_d}= int64(pathll{i_d});
 end
 toc
 
@@ -80,11 +83,11 @@ Cf_u = @(dist,time) uv_cov_parm_u(2).*Gneiting( dist, time, uv_cov_parm_u(3), uv
 Cf_v = @(dist,time) uv_cov_parm_v(2).*Gneiting( dist, time, uv_cov_parm_v(3), uv_cov_parm_v(4), uv_cov_parm_v(5), uv_cov_parm_v(6), uv_cov_parm_v(7) );
 
 
-for i_d=17:g.nat
+for i_d=1:g.nat
     % Sub-selection of the day radar and grid
     neighday{i_d}  = find(ismember( data.dateradar, (i_d-1)*ndc+(1:ndc)));
-    uv_cov_C_u{i_d} = uv.cov.C_u(neighday{i_d},neighday{i_d});
-    uv_cov_C_v{i_d} = uv.cov.C_v(neighday{i_d},neighday{i_d});
+    uv_cov_C_u_i_d = uv.cov.C_u(neighday{i_d},neighday{i_d});
+    uv_cov_C_v_i_d = uv.cov.C_v(neighday{i_d},neighday{i_d});
     uv_utrans{i_d} =  uv.utrans(neighday{i_d});
     uv_vtrans{i_d} =  uv.vtrans(neighday{i_d});
     sim{i_d} = find(g.dateradar==i_d);
@@ -106,8 +109,6 @@ for i_d=17:g.nat
     TT_i=tmp_u(pathll{i_d});
     Pathll_i_d = Pathll{i_d};
     neighday_i_d = neighday{i_d};
-    uv_cov_C_u_i_d = uv_cov_C_u{i_d};
-    uv_cov_C_v_i_d = uv_cov_C_v{i_d};
     
     % 5 Loop of scale for multi-grid path
     tic
@@ -117,16 +118,15 @@ for i_d=17:g.nat
         % Find in the index of the path such that the spatio-temporal distance
         % is within wradius. Then, only select the already simulated value
         % (path value less than currently simulated)
-        neighg = find(bsxfun(@and, Ddist_gg(:,LL_i(i_pt))<dist_thr_g , Dtime_gg(:,TT_i(i_pt))'<time_thr_g ));
-        neighg = neighg(Pathll_i_d(neighg)<i_pt);
-        
+        neighg = find(Pathll_i_d<i_pt & bsxfun(@and, Ddist_gg(:,LL_i(i_pt))<dist_thr_g , Dtime_gg(:,TT_i(i_pt))'<time_thr_g ));
         
         Cgp_u = Cf_u( Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(i_pt)), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(i_pt)) );
         [Cgp_u,tmp_u]=maxk(Cgp_u,neighg_nb);
         neighg=neighg(tmp_u);
-        Cgg_u = Cf_u(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(Pathll_i_d(neighg))), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(Pathll_i_d(neighg))));
+        
+        Cgg_u = uv_cov_parm_u(1)*eye(numel(neighg)) + Cf_u(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(Pathll_i_d(neighg))), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(Pathll_i_d(neighg))));
         Cgp_v = Cf_v(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(i_pt)), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(i_pt)));
-        Cgg_v = Cf_v(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(Pathll_i_d(neighg))), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(Pathll_i_d(neighg))));
+        Cgg_v = uv_cov_parm_v(1)*eye(numel(neighg)) + Cf_v(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(Pathll_i_d(neighg))), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(Pathll_i_d(neighg))));
         
         
         % 2. Find the radar neigh
@@ -154,12 +154,12 @@ for i_d=17:g.nat
         assert(isreal(S_v_tmp(i_pt)))
     end
     
-    NEIGHG{i_d} = NEIGHG_tmp;
-    NEIGHR{i_d} = NEIGHR_tmp;
-    LAMBDA_u{i_d} = LAMBDA_u_tmp;
-    LAMBDA_v{i_d} = LAMBDA_v_tmp;
-    S_u{i_d} = S_u_tmp;
-    S_v{i_d} = S_v_tmp;
+    NEIGHG{i_d} = single(NEIGHG_tmp);
+    NEIGHR{i_d} = single(NEIGHR_tmp);
+    LAMBDA_u{i_d} = single(LAMBDA_u_tmp);
+    LAMBDA_v{i_d} = single(LAMBDA_v_tmp);
+    S_u{i_d} = single(S_u_tmp);
+    S_v{i_d} = single(S_v_tmp);
     
 %     dlmwrite(['data/sim_flight_NEIGHG_' num2str(i_d)],NEIGHG{i_d})
 %     dlmwrite(['data/sim_flight_NEIGHR_' num2str(i_d)],NEIGHR{i_d})
@@ -171,6 +171,17 @@ for i_d=17:g.nat
     
 end
 
+
+for i_d=1:g.nat
+    NEIGHG{i_d} = single(NEIGHG{i_d} );
+    NEIGHR{i_d} = single(NEIGHR{i_d});
+    LAMBDA_u{i_d} = single(LAMBDA_u{i_d});
+    LAMBDA_v{i_d} = single(LAMBDA_v{i_d});
+    S_u{i_d} = single(S_u{i_d});
+    S_v{i_d} = single(S_v{i_d});
+end
+
+
 % save('data/Flight_simulationMap','NEIGHG','NEIGHR','LAMBDA_u','LAMBDA_v','pathll','S_u','S_v','neighday','sim','-v7.3')
 % load('data/Flight_simulationMap')
 
@@ -179,14 +190,12 @@ end
 
 [latmask, lonmask]=ind2sub([g.nlat g.nlon],find(g.latlonmask));
 
-nb_real = 1; 
-real_un = nan(g.nlat,g.nlon,g.nt,nb_real);
-real_vn = nan(g.nlat,g.nlon,g.nt,nb_real);
+nb_real = 100; 
+real_un_ll = nan(g.nlm,g.nt,nb_real);
+real_vn_ll = nan(g.nlm,g.nt,nb_real);
 
 
 for i_real=1:nb_real
-    real_u_ll=nan(g.nlm,g.nt);
-    real_v_ll=nan(g.nlm,g.nt);
     rng('shuffle');
     Uu=randn(g.nlm,g.nt);
     Uv=randn(g.nlm,g.nt);
@@ -206,21 +215,17 @@ for i_real=1:nb_real
             %assert(isreal(Resd(pathll{i_d}(i_pt))))
         end
         
-        real_u_ll(:,sim{i_d}) = tmp_u;
-        real_v_ll(:,sim{i_d}) = tmp_v;
+        real_un_ll(:,sim{i_d},i_real) = tmp_u;
+        real_vn_ll(:,sim{i_d},i_real) = tmp_v;
         
     end
-    tmp2 = nan(g.nlat,g.nlon,g.nt);
-    tmp2(repmat(g.latlonmask,1,1,g.nt))=real_u_ll;
-    real_un(:,:,:,i_real) = tmp2;
-    tmp2 = nan(g.nlat,g.nlon,g.nt);
-    tmp2(repmat(g.latlonmask,1,1,g.nt))=real_v_ll;
-    real_vn(:,:,:,i_real) = tmp2;
 end
 
-real_u = real_un *uv.trans.std(1) + uv.trans.mean(1);
-real_v = real_vn *uv.trans.std(2) + uv.trans.mean(2);
+real_u_ll = single(real_un_ll *uv.trans.std(1) + uv.trans.mean(1));
+real_v_ll = single(real_vn_ll *uv.trans.std(2) + uv.trans.mean(2));
 
+
+save('data/Flight_simulationMap_real_ll','real_u_ll','real_v_ll','-v7.3');
 
 i_real=1;
 
@@ -251,63 +256,6 @@ for i_t = 1:numel(mask_fullday)
 %         imwrite(imind,cm,[filename '.gif'],'gif','WriteMode','append');
 %     end
     delete(hsurf); delete(hscat);
-end
-
-v=VideoWriter([filename '.avi']);
-v.FrameRate = 4;
-v.Quality = 75;
-open(v);
-writeVideo(v, Frame);
-close(v);
-
-
-
-%% 3. Reassemble
-
-t = repmat(g.lat3D.*trend.p(1)+trend.p(2),1,1,1,nb_real);
-A = real_A(:,:,g.dateradar,:);
-p = repmat(polyval(curve.p,g.scoret),1,1,1,nb_real);
-
-real_denstrans = t + A + p + real_f;
-
-real_denstrans(real_denstrans<0)=0;
-real_dens = (real_denstrans).^(1./pow_a);
-
-
-% save('data/Density_simulationMap_reassemble','real_res','real_A','real_dens')
-% load('data/Density_simulationMap_reassemble')
-
-
-h=figure(2);  
-filename='data/Density_simulationMap_reassemble';
-mask_fullday = find(~reshape(all(all(isnan(real_dens(:,:,:,i_real)),1),2),g.nt,1));
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-Frame(numel(mask_fullday)-1) = struct('cdata',[],'colormap',[]); 
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-set(gcf,'color','w'); %hcoast=plotm(coastlat, coastlon,'k');
- hsurf=[]; hscat=[];caxis([-2 4]); c=colorbar;c.Label.String = 'Bird density [Log bird/km^2]';
-for i_t = 1:numel(mask_fullday)
-
-    hsurf=surfm(g.lat2D,g.lon2D,log10(real_dens(:,:,mask_fullday(i_t),i_real)));
-
-%     gtit = datenum(g.time(mask_fullday(i_t)+([-1 0 1])));
-%     id = find(mean(gtit(1:2))<data.time & mean(gtit(2:3))>data.time);
-%     if sum(id)>0
-%         G = findgroups(data.dateradar(id));
-%         hscat=scatterm(splitapply(@mean,data.lat(id),G),splitapply(@mean,data.lon(id),G),[],splitapply(@mean,log(data.dens(id)),G),'filled','MarkerEdgeColor','k');
-%     end
-%     uistack(hcoast,'top')
-    
-    title(datestr(g.time(mask_fullday(i_t)))); drawnow;
-    Frame(i_t) = getframe(h);
-    [imind,cm] = rgb2ind(frame2im(Frame(i_t)),256); 
-    if i_t == 1
-        imwrite(imind,cm,filename,'gif', 'Loopcount',inf);
-    else
-        imwrite(imind,cm,filename,'gif','WriteMode','append');
-    end
-    delete(hsurf);% delete(hscat);
 end
 
 v=VideoWriter([filename '.avi']);

@@ -8,8 +8,8 @@ clear all; load('./data/dc_corr.mat'); load coastlines; addpath('../functions/')
 for i_d=1:numel(dc)
 
     % Combine Speed and angle as complex number
-    dc(i_d).u = dc(i_d).ff .* sind(dc(i_d).dd);
-    dc(i_d).v = dc(i_d).ff .* cosd(dc(i_d).dd);
+    dc(i_d).u = dc(i_d).ff .* sind(dc(i_d).dd); % m/s | 0° is north and 90° is west. -> u is east (+) - west (-) 
+    dc(i_d).v = dc(i_d).ff .* cosd(dc(i_d).dd); % m/s  -> v is north (+) - south (-) 
 
     % Aggregation according to elevation but weighted by the number of bird.
     % compute height bin size

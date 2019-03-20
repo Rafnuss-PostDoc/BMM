@@ -1,35 +1,39 @@
 %% Load data
-clear all; load('./data/dc_corr.mat'); load coastlines; addpath('../functions/'); warning('off'); load('data/Density_modelInf.mat'); load('data/Density_estimationMap')
+clear all; load coastlines; addpath('./functions/');
+load('./data/dc_corr.mat'); load('data/Density_modelInf.mat'); load('data/Density_estimationMap')
+load('./data/Density_simulationMap_reassemble_ll.mat')
 
 
 %% Figure 2: Radar availability
-load('./data/d_all.mat')
-
-for i_d=1:numel(d)
-    d_i_d = datenum(getabstime(d(i_d).dens));
-    n(i_d) = sum(unique(round(d_i_d))>datenum(start_date) & unique(round(d_i_d))<datenum(end_date));
-end
+% load('./data/d_all.mat')
+% 
+% for i_d=1:numel(d)
+%     d_i_d = datenum(getabstime(d(i_d).dens));
+%     n(i_d) = sum(unique(round(d_i_d))>datenum(start_date) & unique(round(d_i_d))<datenum(end_date));
+% end
 
 figure('position',[0 0 800 600]);
-worldmap([min([d.lat]) max([d.lat])], [min([d.lon]) max([d.lon])]);  
-files={'gt30w020n90','gt30e020n40','gt30w020n40','gt30e020n90'};
+worldmap([42 69], [-7 32]);  
+files={'gt30w020n90','gt30e020n90'}; % ,'gt30e020n40','gt30w020n40'
 for i=1:numel(files)
-    [X,cmap,R] = geotiffread(['C:\Users\rnussba1\Documents\MATLAB\' files{i}]);
+    [X,cmap,R] = geotiffread(['C:\Users\rnussba1\Documents\MATLAB\bin\' files{i}]);
     geoshow(double(X),cmap,'DisplayType','texturemap')
 end
 demcmap(X)
-% export_fig 'figure/paper/radarsNetwork_1.eps' -eps
+% export_fig 'figure/radarsNetwork_1.eps' -eps
+% print -djpeg -r600 'figure/radarsNetwork_1.jpg'
 
 figure('position',[0 0 800 600]);
-worldmap([min([d.lat]) max([d.lat])], [min([d.lon]) max([d.lon])]);  
-% plotm(coastlat, coastlon,'k','linewidth',2)
-h1=scatterm([d.lat],[d.lon],100,n,'filled','MarkerEdgeColor','k'); 
-h2=scatterm([dc.lat],[dc.lon],100,'MarkerEdgeColor','r');
-c=colorbar('southoutside');c.Label.String='Number of day with data between 19-sept. to 10-oct.';
+worldmap([42 69], [-7 32]);  hold on;
+%plotm(coastlat, coastlon,'k','linewidth',2)
+% h1=scatterm([d.lat],[d.lon],100,n,'filled','MarkerEdgeColor','k'); 
+scatterm([dc.lat],[dc.lon],100,'filled','MarkerFaceColor',[	1, .914, 0], 'MarkerEdgeColor',[.91, .831, 0]);
+scatterm([50.884889, 47.126356], [2.544694, 8.193466],100,'filled','MarkerFaceColor',[.898, .239, 0],'MarkerEdgeColor',[.82, .22, 0]);
+%c=colorbar('southoutside');c.Label.String='Number of day with data between 19-sept. to 10-oct.';
 %textm([d.lat]-.4,[d.lon],{d.name},'HorizontalAlignment','center')
-legend([h1,h2],{'Radars of network','Radars used in the study'})
+%legend([h1,h2],{'Radars of network','Radars used in the study'})
 
-% export_fig 'figure/paper/radarsNetwork_2.eps' -eps
+% export_fig 'figure/radarsNetwork_2.eps' -eps
 
 
 %% Stats Radars
@@ -70,13 +74,13 @@ datetick('x'); axis([datenum(start_date) datenum(end_date-1) 0 5000]); set(gca, 
 subplot(4,1,2); hold on;
 imagesc(datenum(d(i_d).time), d(i_d).interval*(1/2:double(d(i_d).levels)), log(d(i_d).dens)','AlphaData',~isnan(d(i_d).dens'))
 plot([datenum(start_date) datenum(end_date)],[d(i_d).height d(i_d).height],'r','linewidth',2); caxis([-5 5])
-xlabel('Date'); ylabel('Altitude [m]'); c=colorbar; c.Label.String='Bird Density [bird/m^3]';
+xlabel('Date'); ylabel('Altitude [m]'); c=colorbar; c.Label.String='Bird Density [bird/km^3]';
 datetick('x'); axis([datenum(start_date) datenum(end_date-1) 0 5000]); set(gca, 'YDir', 'normal');ylim([0 4000])
 
 subplot(4,1,3); hold on;
 imagesc(datenum(d(i_d).time), d(i_d).interval*(1/2:double(d(i_d).levels)), log(dc(i_d).dens)','AlphaData',~isnan(d(i_d).dens'))
 plot([datenum(start_date) datenum(end_date)],[d(i_d).height d(i_d).height],'r','linewidth',2); caxis([-5 5])
-xlabel('Date'); ylabel('Altitude [m]'); c=colorbar; c.Label.String='Bird Density [bird/m^3]';
+xlabel('Date'); ylabel('Altitude [m]'); c=colorbar; c.Label.String='Bird Density [bird/km^3]';
 datetick('x'); axis([datenum(start_date) datenum(end_date-1) 0 5000]); set(gca, 'YDir', 'normal');ylim([0 4000])
 
 subplot(4,1,4); hold on;
@@ -114,7 +118,7 @@ for i=1:numel(radars)
             end
         end
         plot(datetime(data.time(data.i_r==i_d),'ConvertFrom','datenum'), data.dens(data.i_r==i_d),'.','Color',co(u,:));
-        ylabel('Bird density [bird/m^2]')
+        ylabel('Bird density [bird/km^2]')
         xlim([start_date end_date]); ylim([0 200])
         subplot(nrow,ncol,ncol*i); hold on; box on
         plot(datetime(data.time(data.i_r==i_d),'ConvertFrom','datenum'), data.dens(data.i_r==i_d),'.','Color',co(u,:));
@@ -144,7 +148,7 @@ plot(datetime({'26/09/2016 12:00' '29/09/2016 12:00'}),[t t],'.-k');
 poly = [1^2 1 1;44^2 44 1;22^2 22 1] \ [-30;-30;10];
 
 for i=1:numel(A)
-    d_d=data.dens(data.dateradar==d(i));
+    d_d=data.denstrans(data.dateradar==d(i));
     d_a=datetime(data.time(data.dateradar==d(i)),'ConvertFrom','datenum');
     plot([d_a(1) d_a(end)],[A(i) A(i)],'--k');
     plot(linspace(d_a(1),d_a(end),44),A(i)+[(1:44)'.^2 (1:44)' ones(44,1)]*poly,'k')
@@ -154,8 +158,8 @@ for i=1:numel(A)
         plot([d_a(ii) d_a(ii)],[c_a(ii) d_d(ii)],'Color',[.6 .6 .6])
     end
 end
-plot(datetime(data.time(data.i_r==i_d),'ConvertFrom','datenum'), data.dens(data.i_r==i_d),'.k')
-xlim(datetime({'26/09/2016 12:00' '29/09/2016 12:00'}) ); ylabel('Bird density [bird/m^2]');
+plot(datetime(data.time(data.i_r==i_d),'ConvertFrom','datenum'), data.denstrans(data.i_r==i_d),'.k')
+xlim(datetime({'26/09/2016 12:00' '29/09/2016 12:00'}) ); ylabel('Bird density [bird/km^2]');
 
 % export_fig 'figure/paper/mathematical_model.eps' -eps
 
@@ -257,23 +261,29 @@ xlabel('Time [Days]'); ylabel('Covariance'); box on;  xlim([0 0.4])
 % Figure of bird density estimated and observed with uncerttainty range for
 % a single radat
 i_r = find(strcmp('frave',{dc.name}));
-t = data.time(data.i_r==i_r)';
-e = ( data.denstrans_est(data.i_r==i_r) ).^(1/pow_a);
-ep1 = ( data.denstrans_est(data.i_r==i_r)+norminv(.1).*data.denstrans_sig(data.i_r==i_r) ).^(1/pow_a);
-em1 = ( data.denstrans_est(data.i_r==i_r)+norminv(.9).*data.denstrans_sig(data.i_r==i_r) ).^(1/pow_a);
+for i_r=1:numel(dc)
+    t = data.time(data.i_r==i_r)';
+    e = ( data.denstrans_est(data.i_r==i_r) ).^(1/pow_a);
+    ep1 = ( data.denstrans_est(data.i_r==i_r)+norminv(.1).*data.denstrans_sig(data.i_r==i_r) ).^(1/pow_a);
+    em1 = ( data.denstrans_est(data.i_r==i_r)+norminv(.9).*data.denstrans_sig(data.i_r==i_r) ).^(1/pow_a);
 
-ix = [0 find(diff(t)>1/24*4) numel(t)];
+    ix = [0 find(diff(t)>1/24*4) numel(t)];
 
-figure('position',[0 0 1000 400]); hold on
-for i_x=1:numel(ix)-1
-    id=(ix(i_x)+1):ix(i_x+1);
-    h1=fill([t(id) fliplr(t(id))]', [ep1(id) ; flipud(em1(id))],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5);
-    h2=plot(t(id),e(id),'k','linewidth',2);
+    figure('position',[0 0 1000 400]); hold on
+    for i_x=1:numel(ix)-1
+        id=(ix(i_x)+1):ix(i_x+1);
+        h1=fill([t(id) fliplr(t(id))]', [ep1(id) ; flipud(em1(id))],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5);
+        h2=plot(t(id),e(id),'k','linewidth',2);
+    end
+    h3=plot(t,data.dens(data.i_r==i_r),'.r');
+    axis tight; ylim([0 max(data.dens(data.i_r==i_r))])
+    box on; ylabel('Bird density [bird/km^2]'); xlabel('Date');datetick('x','dd-mmm','keeplimits')
+    legend([h1,h2,h3],'Uncertainty range','Estimate Z^*','Observed data')
+    
+    print(['paper/figure/cross_valid/radar' num2str(i_r) '.png'],'-dpng', '-r600')
+    print(['paper/figure/cross_valid/radar' num2str(i_r) '_vec.eps'],'-depsc', '-r300', '-painters')
 end
-h3=plot(t,data.dens(data.i_r==i_r),'.r');
-axis tight; ylim([0 max(data.dens(data.i_r==i_r))])
-box on; ylabel('Bird density [bird/km^2]'); xlabel('Date');datetick('x','dd-mmm','keeplimits')
-legend([h1,h2,h3],'Uncertainty range','Estimate Z^*','Observed data')
+
 
 % Normalized error of estimation
 err_norm = (data.denstrans-data.denstrans_est)./data.denstrans_sig;
@@ -289,18 +299,48 @@ scatterm([dc.lat],[dc.lon],splitapply(@std,err_norm,data.i_r)*200,splitapply(@me
 scatterm(min([dc.lat])*[1 1 1 1],min([dc.lon])*[1 1 1 1],[1.5 1 0.5 0.25]*200,'filled','MarkerEdgeColor','k'); 
 colorbar;
 
-% figure('position',[0 0 1000 400]); histogram( err_norm );
-% legend(['Normalized error of kriging: mean=' num2str(mean(err_norm)) ' and std=' num2str(std(err_norm))]);
+figure('position',[0 0 1000 400]); histogram( err_norm,'Normalization','pdf' );
+hold on; plot(-4:.1:4,normpdf(-4:.1:4))
+legend(['Normalized error of kriging: mean=' num2str(mean(err_norm)) ' and std=' num2str(std(err_norm))]);
+xlim([-4 4])
 %     
-% figure('position',[0 0 1000 400]); histogram( err_norm );
-% boxplot(err_norm,data.i_r) 
+figure('position',[0 0 1000 400]); histogram( err_norm );
+boxplot(err_norm,data.i_r) 
+ xticklabels({dc.name}); xtickangle(90)
 
 
 %% Figure Validation X-band
 load('data/Density_validationRadars.mat');
-T_Herzeele = readtable(['data/MTR_SorL_allBirds_hourly_Hrange50_1500asl_Hstep1450_inclFlight_13dBadj.csv'],'TreatAsEmpty','NA');
+T_Herzeele = readtable(['comparisonXband/MTR_SorL_allBirds_hourly_Hrange50_1500asl_Hstep1450_inclFlight_13dBadj.csv'],'TreatAsEmpty','NA');
 T_Herzeele(strcmp(T_Herzeele.OperMod,'L'),:)=[];
 T_Herzeele.dens = T_Herzeele.mtr/60/60./(T_Herzeele.meanSpeed./1000);
+T_Herzeele.denstrans = T_Herzeele.dens.^pow_a;
+
+T_Sem = readtable(['comparisonXband/SEM_MTR_allBirds_SeptOct2016_1h_2000m_inclFlight_sepPulse.csv'],'TreatAsEmpty','NA');
+T_Sem(strcmp(T_Sem.oper_mod,'L'),:)=[];
+T_Sem(strcmp(T_Sem.oper_mod,'M'),:)=[];
+T_Sem.dens = T_Sem.mtr/60/60./(T_Sem.meanSpeed./1000);
+T_Sem.denstrans = T_Sem.dens.^pow_a;
+
+ % Score
+[~,idx] = ismember(T_Herzeele.Tint,pt.time);
+idx2=idx>0;
+err_norm_her = (pt.denstrans_est(1,idx(idx2))' - T_Herzeele.denstrans(idx2)) ./ pt.denstrans_sig(1,idx(idx2))';
+[~,idx] = ismember(T_Sem.Tint,pt.time);
+idx2=idx>0;
+err_norm_sem = (pt.denstrans_est(2,idx(idx2))' - T_Sem.denstrans(idx2)) ./ pt.denstrans_sig(2,idx(idx2))';
+disp('Normalized error of kriging: Herzeele')
+disp(['n=' sum(~isnan(err_norm_her))])
+disp(['mean=' num2str(nanmean(err_norm_her)) ' and var=' num2str(nanvar(err_norm_her))])
+disp(['rmse=' num2str(sqrt(nanmean((pt.dens_est(1,idx(idx2))' - T_Herzeele.dens(idx2)).^2)))])
+% a = (T_Herzeele.dens(idx2)<pt.dens_q10(1,idx(idx2))' | T_Herzeele.dens(idx2)>pt.dens_q90(1,idx(idx2))')
+disp('---')
+disp('Normalized error of kriging: Sempach')
+disp(['n=' sum(~isnan(err_norm_sem))])
+disp(['mean=' num2str(nanmean(err_norm_sem)) ' and var=' num2str(nanvar(err_norm_sem))])
+disp(['rmse=' num2str(sqrt(nanmean((pt.dens_est(2,idx(idx2))' - T_Sem.dens(idx2)).^2)))])
+
+
 
 t = pt.time;
 ep1 = ( pt.denstrans_est+norminv(.1).*pt.denstrans_sig ).^(1/pow_a);
@@ -308,37 +348,76 @@ em1 = ( pt.denstrans_est+norminv(.9).*pt.denstrans_sig ).^(1/pow_a);
 ep1(isnan(ep1))=0;
 em1(isnan(em1))=0;
 
-ix = [0 find(diff(t)>1/24*4) numel(t)];
-
-figure('position',[0 0 1000 400]); hold on
+figure('position',[0 0 1000 800]); 
+subplot(2,1,1); hold on
 fill([pt.time fliplr(pt.time)]', [em1(1,:)' ; flipud(ep1(1,:)')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5);
 plot(pt.time,pt.dens_est(1,:),'k','linewidth',2);
 plot(T_Herzeele.Tint,T_Herzeele.dens,'.r');
 xlim([start_date end_date]);xlabel('Date'); ylabel('Bird density [bird/km^2]'); box on
 legend('Uncertainty range','Estimate Z^*','Observed data')
 
+subplot(2,1,2); hold on;
+fill([pt.time fliplr(pt.time)]', [em1(2,:)' ; flipud(ep1(2,:)')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5);
+plot(pt.time,pt.dens_est(2,:),'k','linewidth',2);
+plot(T_Sem.Tint,T_Sem.dens,'.r');
+xlim([start_date end_date]);xlabel('Date'); ylabel('Bird density [bird/km^2]'); box on
+legend('Uncertainty range','Estimate Z^*','Observed data')
+
+print('paper/figure/ValidationPlotTime.eps','-depsc', '-r300', '-painters')
 
 
 
 
 
-%% Figure Result: point
-ix=35; iy=74;
-ep1 = reshape(g.dens_q10(ix,iy,:),1,[]);
-em1 = reshape(g.dens_q90(ix,iy,:),1,[]);
+
+
+
+%% Figure Result: point timeseries
+ix=29; iy=63;
+ep1 = reshape(gd.dens_q10(ix,iy,:),1,[]);
+em1 = reshape(gd.dens_q90(ix,iy,:),1,[]);
 ep1(isnan(ep1))=0;
 em1(isnan(em1))=0;
 
+n_real=3;
+tmp = double(g.latlonmask);
+tmp(ix,iy)=2;
+tmp=tmp(tmp>0);
+tmp=tmp>1;
+i_real = datasample(1:size(real_dens_ll,3),n_real);
+sim = reshape(real_dens_ll(tmp,:,i_real),g.nt,n_real);
+
+
 figure('position',[0 0 1000 400]); hold on
-fill(datenum([g.time fliplr(g.time)]'), [em1' ; flipud(ep1')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5);
-plot(datenum(g.time),reshape(g.dens_est(ix,iy,:),1,[]),'k','linewidth',2);
+h1=fill(datenum([g.time fliplr(g.time)]'), [em1' ; flipud(ep1')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5);
+%plot(datenum(g.time),ep1,'--k'); plot(datenum(g.time),em1,'--k');
+h2=plot(datenum(g.time),reshape(gd.dens_est(ix,iy,:),1,[]),'k','linewidth',2);
+h3=plot(datenum(g.time),sim,'k');
 
 a=reshape(g.mask_rain(ix,iy,:),1,[]);
-imagesc(datenum(g.time),[0 200],[a;a],'AlphaData',~[a;a])
+h4=imagesc(datenum(g.time),[0 200],[a;a],'AlphaData',~[a;a]);
 
 datetick('x','dd mmm','keeplimits','keepticks'); axis tight; ylim([0 max(em1)]); xlabel('Date'); ylabel('Bird density [bird/km^2]'); box on; 
-legend('Uncertainty range','Estimate Z^*','rain')
+legend([h1; h2; h3; h3],'Uncertainty range','Estimation','Simulations','Rain')
 
+print('paper/figure/SumPlotTime_29,63','-r600')
+print('paper/figure/PlotTimeEstSim_29,63.eps','-depsc', '-r300', '-painters')
+
+
+%% Figure result: peak migration
+figure('position',[0 0 1000 400]); hold on
+tmp=nan(g.nlat,g.nlon,g.nt);
+for u=1:3
+    tmp(repmat(g.latlonmask,1,1,g.nt))=real_dens_ll(:,:,u);
+    tmp(~g.mask_rain)=0;
+    [~,i]=max(reshape(nansum(nansum(tmp,1),2),1,[]));
+    subplot(1,3,u);
+    worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
+    geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+    geoshow('worldrivers.shp','Color', 'blue')
+    surfm(g.lat2D,g.lon2D,log10(tmp(:,:,i))); 
+    caxis([0 3])
+end
 
 
 %% Figure Result: Integral global
@@ -349,31 +428,21 @@ area = repmat(dlon*dlat,1,g.nlon,2017);
 area( repmat(~g.mask_water | ~g.mask_distrad,1,1,2017))=nan;
 area(~g.mask_rain)=nan;
 
-g_denstrans_est =g.denstrans_est;
-g_denstrans_est(~g.mask_rain)=nan;
-g_denstrans_sig=g.denstrans_sig;
-g_denstrans_sig(~g.mask_rain)=nan;
+w = area./repmat(nansum(nansum(area,1),2),g.nlat,g.nlon,1);
 
-w = area/nansum(area(:));
-est = reshape( nansum( nansum( g_denstrans_est .* w ,1) ,2),[],1);
-sig = sqrt(reshape( nansum( nansum( g_denstrans_sig.^2 .* (w.^2) ,1) ,2),[],1));
-g_dens_sum = (est .^ (1/pow_a)) * nansum(area(:));
-g_dens_q10_sum = ((est+norminv(.1).*sig) .^ (1/pow_a)) * nansum(area(:));
-g_dens_q90_sum = ((est+norminv(.9).*sig) .^ (1/pow_a)) * nansum(area(:));
+sum_est = reshape( nansum( nansum( (gd.dens_est) .* w ,1) ,2),[],1);
+sum_est(sum_est==0)=nan;
 
-
-figure('position',[0 0 1000 400]); 
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-%plotm(coastlat, coastlon,'k');
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-surfm(g.lat2D,g.lon2D,g_dens_mean);
-colorbar();caxis([0 50])
+sum_sim = nan(numel(sum_est), size(real_dens_ll,3));
+w2= reshape(w(repmat(g.latlonmask,1,1,g.nt)),g.nlm,g.nt);
+for i_real=1:size(real_dens_ll,3)
+    sum_sim(:,i_real) = nansum( (real_dens_ll(:,:,i_real)) .* w2 );
+end
+sum_sim(sum_sim==0)=nan;
 
 figure('position',[0 0 1000 400]);   hold on;
-fill([g.time fliplr(g.time)]', [g_dens_q10_sum ; flipud(g_dens_q90_sum)],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5)
-a=g_dens_sum; a(a==0)=nan;
-plot(g.time,a,'k','linewidth',2);
+plot(g.time,sum_sim,'color',[.7 .7 .7]);
+plot(g.time,sum_est,'k','linewidth',2);
 xlabel('Date'); ylabel('Total number of bird'); box on
 axis tight
 
@@ -439,8 +508,7 @@ geoshow('worldrivers.shp','Color', 'blue')
 plotm(g.lat2D(in), g.lon2D(in),'.');
 
 
-%%
-
+%
 figure('position',[0 0 1000 400]); 
 worldmap([min([g.lat]) max([g.lat])], [min([g.lon]) max([g.lon])]); 
 %plotm(coastlat, coastlon,'k');
@@ -490,14 +558,13 @@ figure('position',[0 0 1400 1400]); hold on;
 for it=1:numel(i_t)
     subplot(2,ceil(numel(i_t)/2),it);
     worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-    plotm(coastlat, coastlon,'k');
     geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
     geoshow('worldrivers.shp','Color', 'blue')
-    surfm(g.lat2D,g.lon2D,log10(g.dens_est(:,:,i_t(it))));
+    surfm(g.lat2D,g.lon2D,log10(gd.dens_est(:,:,i_t(it))));
     for ill=1:numel(i_lat)
         scatterm(g.lat(i_lat(ill)),g.lon(i_lon(ill)),'r','filled')
     end
-    %c=colorbar('southoutside'); c.Label.String='Bird Density [bird/m^3]';
+    %c=colorbar('southoutside'); c.Label.String='Bird Density [bird/km^3]';
     caxis(c_axis);
 end
 
@@ -518,7 +585,7 @@ end
 %     for ill=1:numel(i_lat)
 %         scatterm(g.lat(i_lat(ill)),g.lon(i_lon(ill)),'r','filled')
 %     end
-%     %c=colorbar('southoutside'); c.Label.String='Bird Density [bird/m^3]';
+%     %c=colorbar('southoutside'); c.Label.String='Bird Density [bird/km^3]';
 %     caxis(c_axis);
 %     %export_fig(['figure/paper/estimation' num2str(it) '.eps'],'-eps')
 % end
@@ -553,6 +620,81 @@ ylim([0 150]); box on;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% APPENDIX
+
+
+%% Figure: histogram raw data
+figure('position',[0 0 1000 400]);
+subplot(2,1,1)
+histogram(data.dens); xlabel('Histogram of bird density Z [bird/km^2]'); axis tight;
+subplot(2,1,2); hold on; box on;
+histogram(data.denstrans); xlabel('Histogram of transformed bird density Z^p')
+plot(.4:.01:2.4, 1150.*normpdf(.4:.01:2.4,mean(data.denstrans), std(data.denstrans)),'k','linewidth',2);
+
+% export_fig 'paper/figure/Appendix/Appendix_histogram.eps' '-eps'
+% print('paper/figure/Appendix/Appendix_histogram.png', '-r600', '-dpng')
+
+%% Figure: trend
+
+S=zeros(numel(dc), 1);
+for i=1:numel(dc)
+    S(i)=mean(data.denstrans(data.i_r==i));
+end
+
+figure('position',[0 0 1000 400]);  
+subplot(1,2,1); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
+[LAT,LON] = meshgrid(min([dc.lat]):max([dc.lat]),min([dc.lon]):max([dc.lon]));
+surfm(LAT,LON,LAT*trend.p(1)+trend.p(2))
+plotm(coastlat, coastlon,'k')
+geoshow('worldrivers.shp','Color', 'blue')
+scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,S,'filled','MarkerEdgeColor','k'); %title('fitted planar trend with average of radar'); 
+colorbar
+
+% subplot(1,3,1); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
+% geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+% geoshow('worldrivers.shp','Color', 'blue')
+% scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,S,'filled','MarkerEdgeColor','k'); %title('fitted planar trend with average of radar'); 
+
+subplot(1,2,2); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
+geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+geoshow('worldrivers.shp','Color', 'blue')
+scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,S-trend.t,'filled','MarkerEdgeColor','k'); % title('Residual average of radar');
+colorbar
+
+
+%% Figure: curve
+figure('position',[0 0 1000 400]);   hold on;
+x=(-1:.01:1)';
+y=polyval( curve.p, x);
+z=sqrt(polyval( res.p, x));
+
+fill([x ; flipud(x)], [y-3*z ; flipud(y+3*z)],[.9 .9 .9],'EdgeColor','none')
+fill([x ; flipud(x)], [y-2*z ; flipud(y+2*z)],[.8 .8 .8],'EdgeColor','none')
+fill([x ; flipud(x)], [y-1*z ; flipud(y+1*z)],[.7 .7 .7],'EdgeColor','none')
+c=data.denstrans-trend.t(data.i_r)-ampli.A(data.dateradar);
+plot(data.scoret(1:4:end),c(1:4:end),'.k','MarkerSize',0.5);
+plot(x,y,'-k','linewidth',2)
+xlabel('Normalized Night Time (NNT)'); ylabel('Normalized Bird density');  box on;
+
 %% Figure 6: Cleaning
 load('./data/d.mat');
 load('./data/dc_corr.mat')
@@ -562,20 +704,26 @@ fig0=figure('position',[0 0 1000 400]);
 i_dc=find(strcmp({dc.name},'dedrs'));
 
 for i_dc=1:numel(dc)
-clf;
-i_d=find(strcmp({d.name},dc(i_dc).name));
-subplot(2,1,1); hold on;
-imagesc(datenum(d(i_d).time), d(i_d).interval*(1/2:double(d(i_d).levels)), log(d(i_d).dens)','AlphaData',~isnan(d(i_d).dens'))
-%plot([datenum(start_date) datenum(end_date)],[d(i_d).height d(i_d).height],'r','linewidth',2); caxis([-5 5])
-xlabel('Date'); ylabel('Altitude [m]'); c=colorbar; c.Label.String='Bird Density [bird/m^3]'; caxis([0 5])
-datetick('x'); axis([datenum(start_date) datenum(end_date-1) 0 5000]); set(gca, 'YDir', 'normal')
-
-subplot(2,1,2); hold on;
-imagesc(datenum(dc(i_dc).time), dc(i_dc).interval*(1/2:double(dc(i_dc).levels)), log(dc(i_dc).dens)', 'AlphaData',~isnan(dc(i_dc).dens)')
-%plot([datenum(start_date) datenum(end_date)],[dc(i_d).height dc(i_d).height],'r','linewidth',2); caxis([-5 5])
-xlabel('Date'); ylabel('Altitude [m]'); c=colorbar; c.Label.String='Bird Density [bird/m^3]'; caxis([0 5])
-datetick('x'); axis([datenum(start_date) datenum(end_date-1) 0 5000]); set(gca, 'YDir', 'normal')
-keyboard
+    clf;
+    i_d=find(strcmp({d.name},dc(i_dc).name));
+    subplot(3,1,1); hold on;
+    imagesc(datenum(d(i_d).time), d(i_d).interval/1000*(1/2:double(d(i_d).levels)), (d(i_d).DBZH)','AlphaData',~isnan(d(i_d).DBZH'))
+    xlabel('Date'); ylabel('Altitude [km]'); c=colorbar; c.Label.String='Raw reflectivity'; %caxis([0 5])
+    datetick('x','dd mmm'); axis([datenum(start_date) datenum(end_date-1) 0 5]); set(gca, 'YDir', 'normal')
+    
+    subplot(3,1,2); hold on;
+    imagesc(datenum(d(i_d).time), d(i_d).interval/1000*(1/2:double(d(i_d).levels)), log10(d(i_d).dens)','AlphaData',~isnan(d(i_d).dens'))
+    %plot([datenum(start_date) datenum(end_date)],[d(i_d).height d(i_d).height],'r','linewidth',2); caxis([-5 5])
+    xlabel('Date'); ylabel('Altitude [km]'); c=colorbar; c.Label.String='Bird Density [Log bird/km^3]'; caxis([0 max(log10(dc(i_dc).dens(:)))])
+    datetick('x','dd mmm'); axis([datenum(start_date) datenum(end_date-1) 0 5]); set(gca, 'YDir', 'normal')
+    
+    subplot(3,1,3); hold on;
+    imagesc(datenum(dc(i_dc).time), dc(i_dc).interval/1000*(1/2:double(dc(i_dc).levels)), log10(dc(i_dc).dens)', 'AlphaData',~isnan(dc(i_dc).dens)')
+    rectangle('Position',[0 -1 datenum(end_date+2) 1+dc(i_dc).height/1000], 'FaceColor',[1 1 1],'EdgeColor','k','LineWidth',2)
+    xlabel('Date'); ylabel('Altitude [km]'); c=colorbar; c.Label.String='Bird Density [Log bird/km^3]'; caxis([0 max(log10(dc(i_dc).dens(:)))])
+    datetick('x','dd mmm'); axis([datenum(start_date) datenum(end_date-1) 0 5]); set(gca, 'YDir', 'normal')
+    %keyboard
+    print(['paper/figure/cleaning/' num2str(i_dc) ,'_', dc(i_dc).name '.png'],'-dpng', '-r300')
 end
 
 % export_fig 'figure/paper/clenaning.eps' -eps
