@@ -54,8 +54,8 @@ The data used in this study are found on the repository of [European Network for
 
 | 					| Density [bird/m<sup>2</sup>] | Flight |
 | ------------- 	| ------------- 	 | ------------- |
-|  Estimation Map 	|  <img src="2016/figure/Density_estimationMap_reassamble.gif">  | <img src="2016/figure/Flight_estimationMap_reassamble.gif">  |
-| Simulation Map    |  <img src="2016/figure/Density_simulationMap_reassamble.gif"> | <img src="2016/figure/Flight_simulationMap.gif"> |
+|  Estimation Map 	|  <img src="2016/figure/Density_estimationMap_reassamble.gif">  | <img src="2016/figure/Flight_estimationMape.gif">  |
+| Simulation Map    |  <img src="2016/figure/Density_simulationMap_reassemble.gif"> | <img src="2016/figure/Flight_simulationMap.gif"> |
 
 
 ## Read more
