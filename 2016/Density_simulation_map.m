@@ -416,26 +416,33 @@ real_denstrans = real_A(:,:,g.dateradar,:) + repmat(t,1,1,1,nb_real) +  repmat(p
 real_denstrans(real_denstrans<0)=0; % 0.15% 
 real_dens = (real_denstrans).^(1./pow_a);
 
-real_dens2=reshape(real_dens(repmat(g.latlonmask,1,1,g.nt,nb_real)),g.nlm,g.nt,nb_real);
-% t_nan=reshape(all(all(isnan(real_dens(:,:,:,1)),1),2),1,[]);
-
 % save('data/Density_simulationMap_reassemble','real_dens','-v7.3')
-% load('data/Density_simulationMap_reassemble')
+% load('data/Density_simulationMap_reassemble.mat')
 
+real_dens_ll=reshape(real_dens(repmat(g.latlonmask,1,1,g.nt,nb_real)),g.nlm,g.nt,nb_real);
+
+% save('data/Density_simulationMap_reassemble_ll','real_dens','-v7.3')
+% load('data/Density_simulationMap_reassemble_ll.mat')
+
+%% Figure
 
 i_real=1;
+dens = nan(g.nlat,g.nlon,g.nt);
+dens(repmat(g.latlonmask,1,1,g.nt)) = real_dens_ll(:,:,i_real);
+
 h=figure(2);  
 filename='data/Density_simulationMap_reassemble';
-mask_fullday = find(~reshape(all(all(isnan(real_dens(:,:,:,i_real)),1),2),g.nt,1));
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
+mask_fullday = find(~reshape(all(all(isnan(dens),1),2),g.nt,1));
+worldmap([min(g.lat) max(g.lat)], [min(g.lon) max(g.lon)]);  
 Frame(numel(mask_fullday)-1) = struct('cdata',[],'colormap',[]); 
 geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
 geoshow('worldrivers.shp','Color', 'blue')
 set(gcf,'color','w'); %hcoast=plotm(coastlat, coastlon,'k');
- hsurf=[]; hscat=[];caxis([0 3]); c=colorbar;c.Label.String = 'Bird density [Log bird/km^2]';
+hsurf=[]; hscat=[];caxis([0 3]); c=colorbar;c.Label.String = 'Bird density [Log bird/km^2]';
+
 for i_t = 1:numel(mask_fullday)
 
-    hsurf=surfm(g.lat2D,g.lon2D,log10(real_dens(:,:,mask_fullday(i_t),i_real)));
+    hsurf=surfm(g.lat2D,g.lon2D,log10(dens(:,:,mask_fullday(i_t))));
 
 %     gtit = datenum(g.time(mask_fullday(i_t)+([-1 0 1])));
 %     id = find(mean(gtit(1:2))<data.time & mean(gtit(2:3))>data.time);
@@ -449,9 +456,9 @@ for i_t = 1:numel(mask_fullday)
     Frame(i_t) = getframe(h);
     [imind,cm] = rgb2ind(frame2im(Frame(i_t)),256); 
     if i_t == 1
-        imwrite(imind,cm,filename,'gif', 'Loopcount',inf);
+        imwrite(imind,cm,[filename '.gif'],'gif', 'Loopcount',inf,'DelayTime',0.1);
     else
-        imwrite(imind,cm,filename,'gif','WriteMode','append');
+        imwrite(imind,cm,[filename '.gif'],'gif','WriteMode','append','DelayTime',0.1);
     end
     delete(hsurf);% delete(hscat);
 end

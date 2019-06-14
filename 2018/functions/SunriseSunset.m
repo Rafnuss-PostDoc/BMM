@@ -15,7 +15,6 @@ for i_d=1:numel(d)
     end
 end
 
-
 save('data/sunrisesunset.mat','time','data')
 
 

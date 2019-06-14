@@ -6,25 +6,26 @@ T = readtable('data/coverage.csv');
 
 % Create a cell for all data. 
 cr = unique(T.countryradar);
-for i_cr = 1:numel(cr)
-    d(i_cr).name = cr{i_cr};
-    d(i_cr).date = unique(char(T(strcmp(T.countryradar,cr{i_cr}),:).date,'uuuu-MM'),'rows');
-end
-
-% Filter date
-for i_d=1:numel(d)
+clear d
+for i_d = 1:numel(cr)
+    d(i_d).name = cr{i_d};
+    d(i_d).date = unique(char(T(strcmp(T.countryradar,d(i_d).name),:).date,'uuuu-MM'),'rows');
+    
     tmp = datetime(d(i_d).date,'InputFormat','yyyy-MM');
     d(i_d).date(tmp<start_date | tmp>end_date,:)=[];
 end
 
+% folder location
+folder_root = 'F:\Rafnuss-tmp\'; % 'C:\Users\rnussba1\Documents\BMM\data\'
 
-for i_d=23:numel(d)
+for i_d=1:numel(d)
     
-    d(i_d).time = [];d(i_d).stime = [];d(i_d).etime = [];
+    d(i_d).time = [];
+%     d(i_d).stime = [];
+%     d(i_d).etime = [];
     for i_quantity = 1:numel(quantity)
         d(i_d).(quantity{i_quantity}) = [];
     end
-    
     
     d(i_d).levels=nan(size(d(i_d).date,1),1);
 
@@ -33,18 +34,21 @@ for i_d=23:numel(d)
         filename = [d(i_d).name, strrep(d(i_d).date(i_dd,:),'-','')];
         
         % Download all the available file and unzip them
-%         if exist(['C:\Users\rnussba1\Documents\BMM\data\' filename], 'dir') ~= 7
-%             try
-%                 path = ['https://lw-enram.s3-eu-west-1.amazonaws.com/', d(i_d).name(1:2), '/', d(i_d).name(3:5), '/', extractBefore(d(i_d).date(i_dd,:),'-'), '/' ];
-%                 websave(['C:\Users\rnussba1\Documents\BMM\data\' filename  '.zip'],[path filename '.zip'])
-%                 unzip(['C:\Users\rnussba1\Documents\BMM\data\' filename  '.zip'],['C:\Users\rnussba1\Documents\BMM\data\' filename '/'])
-%             catch
-%                 disp(filename)
-%             end
-%         end
+        if exist([folder_root filename '.zip'], 'file') ~= 2
+            path = ['https://lw-enram.s3-eu-west-1.amazonaws.com/', d(i_d).name(1:2), '/', d(i_d).name(3:5), '/', extractBefore(d(i_d).date(i_dd,:),'-'), '/' ];
+            try
+                websave([folder_root filename  '.zip'],[path filename '.zip']);
+                unzip([folder_root filename  '.zip'],[folder_root filename '/']);
+            catch
+                delete([folder_root filename  '.zip'])
+                disp(['Error in downloading or unziping : ' filename ' (' i_dd ')'])
+            end
+        else
+            unzip([folder_root filename  '.zip'],[folder_root filename '/']);
+        end
 
         % Get all the individual h5 files 
-        files = dir(['C:\Users\rnussba1\Documents\BMM\data\', filename, '\**\*.h5']);
+        files = dir([folder_root, filename, '\**\*.h5']);
         
         % Filter date out of range
         if numel(files)>0
@@ -80,21 +84,21 @@ for i_d=23:numel(d)
             
             % clc;h5disp([files(i_file).folder '/' files(i_file).name])
             
-            % Time
-            date =  h5readatt([files(i_file).folder '/' files(i_file).name ],'/what','date');
-            starttime = h5readatt([files(i_file).folder '/' files(i_file).name ],'/how','starttime');
-            endtime = h5readatt([files(i_file).folder '/' files(i_file).name ],'/how','endtime');
-            
-            if str2double(starttime(end-2:end-1))>=60
-               starttime(end-4:end-3) = sprintf('%02i',str2double(starttime(end-4:end-3))+1);
-               starttime(end-2:end-1) = sprintf('%02i',mod(str2double(starttime(end-2:end-1)),60));
-            end
-            if str2double(endtime(end-2:end-1))>=60
-               endtime(end-4:end-3) = sprintf('%02i',str2double(endtime(end-4:end-3))+1);
-               endtime(end-2:end-1) = sprintf('%02i',mod(str2double(endtime(end-2:end-1)),60));
-            end
-            stime(i_file) = datetime( [date(1:end-1) starttime(1:end-1)] ,'InputFormat','yyyyMMddHHmmss');
-            etime(i_file) = datetime( [date(1:end-1) endtime(1:end-1)] ,'InputFormat','yyyyMMddHHmmss');
+%             % Time
+%             date =  h5readatt([files(i_file).folder '/' files(i_file).name ],'/what','date');
+%             starttime = h5readatt([files(i_file).folder '/' files(i_file).name ],'/how','starttime');
+%             endtime = h5readatt([files(i_file).folder '/' files(i_file).name ],'/how','endtime');
+%             
+%             if str2double(starttime(end-2:end-1))>=60
+%                starttime(end-4:end-3) = sprintf('%02i',str2double(starttime(end-4:end-3))+1);
+%                starttime(end-2:end-1) = sprintf('%02i',mod(str2double(starttime(end-2:end-1)),60));
+%             end
+%             if str2double(endtime(end-2:end-1))>=60
+%                endtime(end-4:end-3) = sprintf('%02i',str2double(endtime(end-4:end-3))+1);
+%                endtime(end-2:end-1) = sprintf('%02i',mod(str2double(endtime(end-2:end-1)),60));
+%             end
+%             stime(i_file) = datetime( [date(1:end-1) starttime(1:end-1)] ,'InputFormat','yyyyMMddHHmmss');
+%             etime(i_file) = datetime( [date(1:end-1) endtime(1:end-1)] ,'InputFormat','yyyyMMddHHmmss');
             
             if strfind(files(i_file).name(10:22),'T')>0
                 time(i_file) = datetime( files(i_file).name(10:22) ,'InputFormat','yyyyMMdd''T''HHmm');
@@ -129,8 +133,8 @@ for i_d=23:numel(d)
         end
         
         d(i_d).time=[d(i_d).time; time];
-        d(i_d).stime=[d(i_d).stime; stime];
-        d(i_d).etime=[d(i_d).etime; etime];
+%         d(i_d).stime=[d(i_d).stime; stime];
+%         d(i_d).etime=[d(i_d).etime; etime];
         
         for i_quantity = 1:numel(quantity)
             if size(q{i_quantity},2) == size(d(i_d).(quantity{i_quantity}),2)
@@ -147,6 +151,9 @@ for i_d=23:numel(d)
         end
         
         % d(i_d).dens=append(d(i_d).dens, timeseries(dens,datestr(time)) );
+        if exist([folder_root filename], 'dir') == 7
+            rmdir([folder_root filename], 's')
+        end
     end
 end
 

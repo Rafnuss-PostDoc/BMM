@@ -46,7 +46,7 @@ figure; hold on;
 histogram(ddens,'EdgeColor','none','FaceAlpha',1);
 histogram(data.dens,'EdgeColor','none','FaceAlpha',1);
 set(gca, 'YScale', 'log'); axis([0 600 1 10^5]); %set(gca, 'XScale', 'log')
-% export_fig 'figure/paper/hist_raw_data.eps' -eps
+% export_fig 'figure/paper/hist_raw_data.eps' -epsf
 
 S=nan(numel(dc),1);
 for i=1:numel(dc)
@@ -104,7 +104,7 @@ end
 scatterm([dc.lat],[dc.lon],100,S,'filled','MarkerEdgeColor','k'); colorbar('southoutside');
 
 co=get(gca,'ColorOrder');u=0;
-co=[51,34,136;136,204,238;68,170,153;17,119,51;153,153,51;221,204,119;204,102,119;136,34,85;170,68,153]/255;
+co=[204,102,119;136,34,85;170,68,153;17,119,51;221,204,119;153,153,51;51,34,136;136,204,238;68,170,153]/255;
 radars={{'fikuo','fiuta','fivim'},{'denhb','bewid','frave'},{'frgre','frbor','frmom'}}; %
 for i=1:numel(radars)
     for j=1:numel(radars{i})
@@ -211,8 +211,7 @@ geoshow('worldrivers.shp','Color', 'blue')
 colorbar;
 %print -depsc2 figure/paper/result_calibration_1.eps;
 
-%fig6=figure('position',[0 0 1400 700]); 
-subplot(2,4,[3 4]); hold on;
+fig6=figure('position',[0 0 1400 700]);  hold on;
 x=(-1:.01:1)';
 y=polyval( curve.p, x);
 z=sqrt(polyval( res.p, x));
@@ -223,34 +222,34 @@ plot(x,y,'-k','linewidth',2)
 xlabel('Normalized Night Time (NNT)'); ylabel('Normalized Bird density');  box on; %set(gca,'YScale','log')
 %print -depsc2 figure/paper/result_calibration_2.eps;
 
-%fig6=figure('position',[0 0 1400 700]); 
+fig7=figure('position',[0 0 1400 700]); 
 Gneiting = @(dist,time,range_dist,range_time,delta,gamma,beta) 1./( (time./range_time).^(2.*delta) +1 ) .* exp(-(dist./range_dist).^(2.*gamma)./((time./range_time).^(2.*delta) +1).^(beta.*gamma) );
 tmpD = ampli.cov.d(1):1:ampli.cov.d(end);
 tmpT = ampli.cov.t(1):0.1:ampli.cov.t(end);
-subplot(2,4,5);
+subplot(2,2,1);
 tmpCOV=ampli.cov.parm(2).*Gneiting(tmpD, zeros(size(tmpD)), ampli.cov.parm(3), ampli.cov.parm(4), ampli.cov.parm(5), ampli.cov.parm(6), ampli.cov.parm(7));
 tmpCOV(1)=tmpCOV(1)+ampli.cov.parm(1);
 plot(tmpD,tmpCOV,'-k','linewidth',2);
-xlabel('Distance [km]'); ylabel('Covariance'); box on; xlim([0 2000])
-subplot(2,4,6);
+xlabel('Distance [km]'); ylabel('Covariance'); box on; axis([0 2000 0 1])
+subplot(2,2,2);
 tmpCOV=ampli.cov.parm(2).*Gneiting(zeros(size(tmpT)), tmpT, ampli.cov.parm(3), ampli.cov.parm(4), ampli.cov.parm(5), ampli.cov.parm(6), ampli.cov.parm(7));
 tmpCOV(1)=tmpCOV(1)+ampli.cov.parm(1);
 plot(tmpT,tmpCOV,'-k','linewidth',2);
-xlabel('Time [Days]'); ylabel('Covariance'); box on;  xlim([0 10])
+xlabel('Time [Days]'); ylabel('Covariance'); box on;  axis([0 10 0 1])
 
 %fig6=figure('position',[0 0 1400 700]); 
 tmpD = res.cov.d(1):1:res.cov.d(end);
 tmpT = res.cov.t(1):0.01:res.cov.t(end);
-subplot(2,4,7);
+subplot(2,2,3);
 tmpCOV=res.cov.parm(2).*Gneiting(tmpD, zeros(size(tmpD)), res.cov.parm(3), res.cov.parm(4), res.cov.parm(5), res.cov.parm(6), res.cov.parm(7));
 tmpCOV(1)=tmpCOV(1)+res.cov.parm(1);
 plot(tmpD,tmpCOV,'-k','linewidth',2);
-xlabel('Distance [km]'); ylabel('Covariance'); box on; xlim([0 1000])
-subplot(2,4,8);
+xlabel('Distance [km]'); ylabel('Covariance'); box on; axis([0 1000 0 1])
+subplot(2,2,4);
 tmpCOV=res.cov.parm(2).*Gneiting(zeros(size(tmpT)), tmpT, res.cov.parm(3), res.cov.parm(4), res.cov.parm(5), res.cov.parm(6), res.cov.parm(7));
 tmpCOV(1)=tmpCOV(1)+res.cov.parm(1);
 plot(tmpT,tmpCOV,'-k','linewidth',2);
-xlabel('Time [Days]'); ylabel('Covariance'); box on;  xlim([0 0.4])
+xlabel('Time [Days]'); ylabel('Covariance'); box on;  axis([0 0.4 0 1])
 %print -depsc2 figure/paper/result_calibration_4.eps;
 
 
@@ -295,18 +294,26 @@ figure('position',[0 0 1000 400]); hold on
 worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
 plotm(coastlat, coastlon,'k');
 geoshow('worldrivers.shp','Color', 'blue')
-scatterm([dc.lat],[dc.lon],splitapply(@std,err_norm,data.i_r)*200,splitapply(@mean,err_norm,data.i_r),'filled','MarkerEdgeColor','k'); 
-scatterm(min([dc.lat])*[1 1 1 1],min([dc.lon])*[1 1 1 1],[1.5 1 0.5 0.25]*200,'filled','MarkerEdgeColor','k'); 
-colorbar;
+scatterm([dc.lat],[dc.lon],150,splitapply(@mean,err_norm,data.i_r),'filled'); 
+scatterm([dc.lat],[dc.lon],150+150*(splitapply(@var,err_norm,data.i_r)-1),'MarkerEdgeColor','k'); 
+scatterm(min([dc.lat])*[1 1 1 1],min([dc.lon])*[1 1 1 1],150+150*([1.5 1 0.5 0.25]-1),'filled','MarkerEdgeColor','k'); 
+colormap(interp1([0 .5 1],[0.230, 0.299, 0.754;0.865, 0.865, 0.865;0.706, 0.016, 0.150],linspace(0,1,254)));
+colorbar; caxis([-1.5 1.5])
+
 
 figure('position',[0 0 1000 400]); histogram( err_norm,'Normalization','pdf' );
-hold on; plot(-4:.1:4,normpdf(-4:.1:4))
-legend(['Normalized error of kriging: mean=' num2str(mean(err_norm)) ' and std=' num2str(std(err_norm))]);
+hold on; plot(-4:.1:4,normpdf(-4:.1:4),'linewidth',2)
+legend(['Normalized error of kriging with mean: ' num2str(mean(err_norm),2) ' and variance: ' num2str(var(err_norm),2)]);
 xlim([-4 4])
 %     
 figure('position',[0 0 1000 400]); histogram( err_norm );
-boxplot(err_norm,data.i_r) 
+boxplot(err_norm,data.i_r,'Symbol','.k') 
  xticklabels({dc.name}); xtickangle(90)
+ 
+ [~,b] = sort(abs(splitapply(@mean,err_norm,data.i_r)));
+ [~,a] = sort(abs(splitapply(@var,err_norm,data.i_r)-1));
+ figure; plot(a,b,'x')
+% -> 6
 
 
 %% Figure Validation X-band
@@ -370,8 +377,6 @@ print('paper/figure/ValidationPlotTime.eps','-depsc', '-r300', '-painters')
 
 
 
-
-
 %% Figure Result: point timeseries
 ix=29; iy=63;
 ep1 = reshape(gd.dens_q10(ix,iy,:),1,[]);
@@ -392,7 +397,7 @@ figure('position',[0 0 1000 400]); hold on
 h1=fill(datenum([g.time fliplr(g.time)]'), [em1' ; flipud(ep1')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5);
 %plot(datenum(g.time),ep1,'--k'); plot(datenum(g.time),em1,'--k');
 h2=plot(datenum(g.time),reshape(gd.dens_est(ix,iy,:),1,[]),'k','linewidth',2);
-h3=plot(datenum(g.time),sim,'k');
+h3=plot(datenum(g.time),sim);
 
 a=reshape(g.mask_rain(ix,iy,:),1,[]);
 h4=imagesc(datenum(g.time),[0 200],[a;a],'AlphaData',~[a;a]);
@@ -400,24 +405,196 @@ h4=imagesc(datenum(g.time),[0 200],[a;a],'AlphaData',~[a;a]);
 datetick('x','dd mmm','keeplimits','keepticks'); axis tight; ylim([0 max(em1)]); xlabel('Date'); ylabel('Bird density [bird/km^2]'); box on; 
 legend([h1; h2; h3; h3],'Uncertainty range','Estimation','Simulations','Rain')
 
-print('paper/figure/SumPlotTime_29,63','-r600')
-print('paper/figure/PlotTimeEstSim_29,63.eps','-depsc', '-r300', '-painters')
+% print('paper/figure/SumPlotTime_29,63','-r600')
+% print('paper/figure/PlotTimeEstSim_29,63.eps','-depsc', '-r300', '-painters')
+
+
+
+
+
+%% Figure Result: Nightly variation
+
+it=1512+(1:4:(4*12))-24*4;
+
+col=colormap;
+
+figure('position',[0 0 1000 400]); 
+for i_t=1:length(it)
+    subplot(2,6,i_t)
+    worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
+    geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+    geoshow('worldrivers.shp','Color', 'blue')
+    surfm(g.lat2D,g.lon2D,log10(gd.dens_est(:,:,it(i_t))));
+    tmp=zeros(g.nlat, g.nlon);
+    tmp(g.mask_rain(:,:,it(i_t)))=nan;
+    h=surfm(g.lat2D,g.lon2D,tmp);
+    caxis(log10([1 150])); 
+    colormap([0.6055    0.4883    0.5859;col])
+end
+
+% print(['paper/figure/Spatial_hourly_' num2str(i_t) '.eps'],'-depsc')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% APPENDIX
+
+
+%% Figure: histogram raw data
+figure('position',[0 0 1000 400]);
+subplot(2,1,1)
+histogram(data.dens); xlabel('Histogram of bird density Z [bird/km^2]'); axis tight;
+subplot(2,1,2); hold on; box on;
+histogram(data.denstrans); xlabel('Histogram of transformed bird density Z^p')
+plot(.4:.01:2.4, 1150.*normpdf(.4:.01:2.4,mean(data.denstrans), std(data.denstrans)),'k','linewidth',2);
+
+% export_fig 'paper/figure/Appendix/Appendix_histogram.eps' '-eps'
+% print('paper/figure/Appendix/Appendix_histogram.png', '-r600', '-dpng')
+
+%% Figure: trend
+
+S=zeros(numel(dc), 1);
+for i=1:numel(dc)
+    S(i)=mean(data.denstrans(data.i_r==i));
+end
+
+figure('position',[0 0 1000 400]);  
+subplot(1,2,1); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
+[LAT,LON] = meshgrid(min([dc.lat]):max([dc.lat]),min([dc.lon]):max([dc.lon]));
+surfm(LAT,LON,LAT*trend.p(1)+trend.p(2))
+plotm(coastlat, coastlon,'k')
+geoshow('worldrivers.shp','Color', 'blue')
+scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,S,'filled','MarkerEdgeColor','k'); %title('fitted planar trend with average of radar'); 
+colorbar
+
+% subplot(1,3,1); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
+% geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+% geoshow('worldrivers.shp','Color', 'blue')
+% scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,S,'filled','MarkerEdgeColor','k'); %title('fitted planar trend with average of radar'); 
+
+subplot(1,2,2); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
+geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+geoshow('worldrivers.shp','Color', 'blue')
+scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,S-trend.t,'filled','MarkerEdgeColor','k'); % title('Residual average of radar');
+colorbar
+
+
+%% Figure: curve
+figure('position',[0 0 1000 400]);   hold on;
+x=(-1:.01:1)';
+y=polyval( curve.p, x);
+z=sqrt(polyval( res.p, x));
+
+fill([x ; flipud(x)], [y-3*z ; flipud(y+3*z)],[.9 .9 .9],'EdgeColor','none')
+fill([x ; flipud(x)], [y-2*z ; flipud(y+2*z)],[.8 .8 .8],'EdgeColor','none')
+fill([x ; flipud(x)], [y-1*z ; flipud(y+1*z)],[.7 .7 .7],'EdgeColor','none')
+c=data.denstrans-trend.t(data.i_r)-ampli.A(data.dateradar);
+plot(data.scoret(1:4:end),c(1:4:end),'.k','MarkerSize',0.5);
+plot(x,y,'-k','linewidth',2)
+xlabel('Normalized Night Time (NNT)'); ylabel('Normalized Bird density');  box on;
+
+%% Residual map
+for i_r=1:numel(dc)
+    res_r_m(i_r)=mean(res.rn(data.i_r==i_r));
+    res_r_std(i_r)=std(res.rn(data.i_r==i_r));
+end
+
+figure('position',[0 0 1000 400]);  
+subplot(1,2,1); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
+geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+geoshow('worldrivers.shp','Color', 'blue')
+scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,res_r_m,'filled','MarkerEdgeColor','k'); title('Average Residual'); 
+colorbar; caxis([-.2 .2])
+colormap(interp1([0 .5 1],[0.230, 0.299, 0.754;0.865, 0.865, 0.865;0.706, 0.016, 0.150],linspace(0,1,254)));
+
+subplot(1,2,2); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
+geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+geoshow('worldrivers.shp','Color', 'blue')
+scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,res_r_std,'filled','MarkerEdgeColor','k'); title('Std residual'); 
+colorbar; caxis([.5 1.5])
+colormap(interp1([0 .5 1],[0.230, 0.299, 0.754;0.865, 0.865, 0.865;0.706, 0.016, 0.150],linspace(0,1,254)));
+
+
+
+scatterm([dc.lat],[dc.lon],150,splitapply(@mean,err_norm,data.i_r),'filled'); 
+scatterm([dc.lat],[dc.lon],150+150*(splitapply(@var,err_norm,data.i_r)-1),'MarkerEdgeColor','k'); 
+scatterm(min([dc.lat])*[1 1 1 1],min([dc.lon])*[1 1 1 1],150+150*([1.5 1 0.5 0.25]-1),'filled','MarkerEdgeColor','k'); 
+
+
+%% Figure 6: Cleaning
+load('./data/d.mat');
+load('./data/dc_corr.mat')
+
+fig0=figure('position',[0 0 1000 400]); 
+
+i_dc=find(strcmp({dc.name},'dedrs'));
+
+for i_dc=1:numel(dc)
+    clf;
+    i_d=find(strcmp({d.name},dc(i_dc).name));
+    subplot(3,1,1); hold on;
+    imagesc(datenum(d(i_d).time), d(i_d).interval/1000*(1/2:double(d(i_d).levels)), (d(i_d).DBZH)','AlphaData',~isnan(d(i_d).DBZH'))
+    xlabel('Date'); ylabel('Altitude [km]'); c=colorbar; c.Label.String='Raw reflectivity'; %caxis([0 5])
+    datetick('x','dd mmm'); axis([datenum(start_date) datenum(end_date-1) 0 5]); set(gca, 'YDir', 'normal')
+    
+    subplot(3,1,2); hold on;
+    imagesc(datenum(d(i_d).time), d(i_d).interval/1000*(1/2:double(d(i_d).levels)), log10(d(i_d).dens)','AlphaData',~isnan(d(i_d).dens'))
+    %plot([datenum(start_date) datenum(end_date)],[d(i_d).height d(i_d).height],'r','linewidth',2); caxis([-5 5])
+    xlabel('Date'); ylabel('Altitude [km]'); c=colorbar; c.Label.String='Bird Density [Log bird/km^3]'; caxis([0 max(log10(dc(i_dc).dens(:)))])
+    datetick('x','dd mmm'); axis([datenum(start_date) datenum(end_date-1) 0 5]); set(gca, 'YDir', 'normal')
+    
+    subplot(3,1,3); hold on;
+    imagesc(datenum(dc(i_dc).time), dc(i_dc).interval/1000*(1/2:double(dc(i_dc).levels)), log10(dc(i_dc).dens)', 'AlphaData',~isnan(dc(i_dc).dens)')
+    rectangle('Position',[0 -1 datenum(end_date+2) 1+dc(i_dc).height/1000], 'FaceColor',[1 1 1],'EdgeColor','k','LineWidth',2)
+    xlabel('Date'); ylabel('Altitude [km]'); c=colorbar; c.Label.String='Bird Density [Log bird/km^3]'; caxis([0 max(log10(dc(i_dc).dens(:)))])
+    datetick('x','dd mmm'); axis([datenum(start_date) datenum(end_date-1) 0 5]); set(gca, 'YDir', 'normal')
+    %keyboard
+    print(['paper/figure/cleaning/' num2str(i_dc) ,'_', dc(i_dc).name '.png'],'-dpng', '-r300')
+end
+
+% export_fig 'figure/paper/clenaning.eps' -eps
 
 
 %% Figure result: peak migration
 figure('position',[0 0 1000 400]); hold on
-tmp=nan(g.nlat,g.nlon,g.nt);
-for u=1:3
+
+n=3;
+for u=1:n
+    tmp=nan(g.nlat,g.nlon,g.nt);
     tmp(repmat(g.latlonmask,1,1,g.nt))=real_dens_ll(:,:,u);
     tmp(~g.mask_rain)=0;
     [~,i]=max(reshape(nansum(nansum(tmp,1),2),1,[]));
-    subplot(1,3,u);
+    subplot(1,n,u);
     worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
     geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
     geoshow('worldrivers.shp','Color', 'blue')
     surfm(g.lat2D,g.lon2D,log10(tmp(:,:,i))); 
+    title(datestr(g.time(i)))
     caxis([0 3])
+    
+    sum(nansum( tmp(:,:,i) .* area(:,:,i) ))/1000000
 end
+
+
+
 
 
 %% Figure Result: Integral global
@@ -425,30 +602,24 @@ end
 dlat = lldistkm([g.lat(1) g.lon(1)],[g.lat(2) g.lon(1)]);
 dlon = lldistkm([g.lat2D(:,1) g.lon2D(:,1)],[g.lat2D(:,1) g.lon2D(:,2)]);
 area = repmat(dlon*dlat,1,g.nlon,2017);
-area( repmat(~g.mask_water | ~g.mask_distrad,1,1,2017))=nan;
-area(~g.mask_rain)=nan;
 
-w = area./repmat(nansum(nansum(area,1),2),g.nlat,g.nlon,1);
+sum_sim = nan(g.nt, size(real_dens_ll,3));
 
-sum_est = reshape( nansum( nansum( (gd.dens_est) .* w ,1) ,2),[],1);
-sum_est(sum_est==0)=nan;
-
-sum_sim = nan(numel(sum_est), size(real_dens_ll,3));
-w2= reshape(w(repmat(g.latlonmask,1,1,g.nt)),g.nlm,g.nt);
 for i_real=1:size(real_dens_ll,3)
-    sum_sim(:,i_real) = nansum( (real_dens_ll(:,:,i_real)) .* w2 );
+    tmp=nan(g.nlat,g.nlon,g.nt);
+    tmp(repmat(g.latlonmask,1,1,g.nt))=real_dens_ll(:,:,i_real);
+    tmp(~g.mask_rain)=0;
+    sum_sim(:,i_real) = reshape(nansum( nansum(tmp.*area,1),2),[],1);
 end
-sum_sim(sum_sim==0)=nan;
+ssum=sort(sum_sim,2);
 
 figure('position',[0 0 1000 400]);   hold on;
-plot(g.time,sum_sim,'color',[.7 .7 .7]);
-plot(g.time,sum_est,'k','linewidth',2);
+fill([g.time fliplr(g.time)]', [ssum(:,10) ; flipud(ssum(:,90))],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5)
+plot(g.time,mean(sum_sim,2),'k','linewidth',2);
 xlabel('Date'); ylabel('Total number of bird'); box on
 axis tight
 
-
-%% Figure Result: Intrgral by country
-g_latlonmask=find(g.latlonmask);
+%% Figure Result: Integral global and by country
 
 fr=reshape([2.14007280533,47.2536732633,0 -2.53965472699,47.2980540996,0 -2.36708190132,47.501526979,0 -2.83187285057,47.497282048,0 -2.70028183186,47.6370821351,0 -3.1250728303,47.5954091564,0 -3.13263682738,47.4766640749,0 -3.21694569779,47.6505542004,0 -3.98221781844,47.8897182295,0 -4.3673639235,47.8087451889,0 -4.72223677349,48.0391730956,0 -4.28291775751,48.1165271657,0 -4.54659969165,48.1744362261,0 -4.56535487061,48.3227541709,0 -4.76062672833,48.3349912466,0 -4.77666382372,48.5111091144,0 -4.3541639347,48.6741641214,0 -3.58242685212,48.6777732013,0 -3.53666383995,48.825827116,0 -3.22610879437,48.8695819918,0 -2.68528191317,48.5016640506,0 -2.30721784576,48.6761090582,0 -1.9761088648,48.5130451664,0 -1.98805492088,48.6869451826,0 -1.36889077238,48.6436090667,0 -1.5625727507,48.7489539996,0 -1.60971777107,49.2150002227,0 -1.94208185822,49.7215912203,0 -1.26416392105,49.6841641785,0 -1.10958184477,49.3694361186,0 -0.228336873277,49.2836091178,0 0.424718159704,49.4516642653,0 0.075836191201,49.5225641023,0 0.185973225768,49.7040271097,0 1.46110914193,50.1241641403,0 1.62500032753,50.8777731779,0 2.54166319863,51.0911090428,0 2.65055417947,50.8161090248,0 3.15857311809,50.7843642428,0 3.29708205679,50.5243001057,0 4.16500013748,50.2830541795,0 4.1492361245,49.9783731717,0 4.51055415514,49.9474912228,0 4.82472716541,50.1675641263,0 4.86847332403,49.8022182559,0 5.47278222549,49.508882154,0 5.80788233348,49.5450452048,0 6.36217306579,49.459391039,0 6.72923622052,49.1676360994,0 7.42555411159,49.1764540292,0 8.22608219347,48.9644181974,0 7.80221806588,48.5758269625,0 7.57838219081,48.1172002325,0 7.58827317186,47.5844821721,0 7.38541820631,47.4333271207,0 6.99055429033,47.4972181779,0 6.9716631569,47.2919361484,0 6.12868207642,46.5880540927,0 6.11555417199,46.2615269953,0 5.96700924531,46.2072912201,0 6.13326328943,46.149782144,0 6.29555420208,46.3941640755,0 6.73778224139,46.4474910848,0 6.78347316919,46.1547182468,0 7.03805420048,45.9319361446,0 6.79934514109,45.7886641056,0 7.14694518132,45.4305451121,0 7.12778213895,45.2593001476,0 6.62396320438,45.1157270306,0 7.03166316693,44.8313820287,0 6.85278228855,44.5408360948,0 6.97639122085,44.2841641139,0 7.66221815424,44.1708270363,0 7.53193622116,43.782045197,0 7.43929121274,43.7575269566,0 7.40280026189,43.758818105,0 7.39160924765,43.7275452242,0 6.63639121989,43.3111000867,0 6.64166310173,43.1850000528,0 6.16528215965,43.0505539902,0 5.03958216648,43.347909047,0 5.23152724682,43.4658270023,0 5.02416332027,43.5526361944,0 4.81505411384,43.3992180292,0 4.7075002142,43.5720820422,0 4.65278214429,43.3597181428,0 3.96471824858,43.5408361511,0 3.08139121233,43.0694451237,0 2.96131810207,42.8422180982,0 3.17765418545,42.4368092451,0 2.02055424179,42.3526361615,0 1.72360906008,42.5094360893,0 1.73860914641,42.6163911858,0 1.44583614083,42.6019451433,0 0.71610915708,42.8588821599,0 0.675509229642,42.6884820912,0 -0.555836774358,42.7800000689,0 -0.754099798053,42.9643731056,0 -1.4395178622,43.0493731477,0 -1.38513691244,43.2525640599,0 -1.78087288163,43.3599270198,0 -1.44389086874,43.6405450923,0 -1.20860900193,44.6258272521,0 -1.04062694464,44.6749270999,0 -1.24583688971,44.6753450216,0 -1.08944583108,45.5586091936,0 -0.53992674862,44.8956180849,0 -0.781526894062,45.4665180614,0 -1.23885493198,45.7062180293,0 -1.07097278698,45.9039451142,0 -1.11463680295,46.3165821853,0 -1.78639085614,46.4883270466,0 -2.12541788578,46.8309730467,0 -1.9858727762,47.0369271372,0 -2.170836737,47.1266641281,0 -2.14007280533,47.2536732633,0],3,[])';
 de=reshape([9.44535423355,54.8254001391,0 9.97200916046,54.7607542078,0 10.0325001824,54.555273192,0 9.86603608777,54.4572912581,0 10.9794451934,54.3805540962,0 11.0939542286,54.2054821222,0 10.7622181137,54.0565271528,0 10.8185361213,53.8900541734,0 11.0947181553,54.0136091263,0 11.4127731602,53.9197180641,0 12.5269451866,54.4741541386,0 12.9215271354,54.427464088,0 12.4638911464,54.3951360931,0 12.3743730907,54.2624272638,0 13.0238911282,54.3997181443,0 13.4545821483,54.0970821533,0 13.7108273227,54.1708269758,0 13.8085361741,53.8547821189,0 14.2756271176,53.6990641271,0 14.3916911635,53.1441641981,0 14.1491631414,52.8627820313,0 14.6395822626,52.5729822544,0 14.5344452009,52.3962451316,0 14.7607632928,52.0698642146,0 14.6009732048,51.8200640533,0 15.0338182064,51.2866539829,0 14.8283361848,50.8658271218,0 14.3062452041,51.0524911002,0 14.3113911898,50.8822181011,0 12.985554147,50.4183272007,0 12.5154180581,50.3924911575,0 12.3230542179,50.206664196,0 12.0937002006,50.3225361287,0 12.5459731127,49.9095822216,0 12.4555543378,49.6955451266,0 12.6744452253,49.4250002578,0 13.8336092964,48.7736090326,0 13.7260000762,48.5155910857,0 13.4432271841,48.5602361196,0 13.3950002276,48.3661001774,0 12.7597181822,48.1217271308,0 13.0088912095,47.8541642078,0 12.9139542535,47.7250000853,0 13.1001361048,47.642918119,0 13.0125001218,47.4697910819,0 12.7369452217,47.6827091928,0 11.104027097,47.3965270453,0 10.4818002011,47.5865181364,0 10.1733361051,47.2747182105,0 10.2317361774,47.3737450324,0 9.95500009958,47.5397181151,0 9.56672704172,47.5404542139,0 8.56291802597,47.80666413,0 8.40694522432,47.7018001508,0 8.5764180869,47.5913731023,0 7.58827317186,47.5844821721,0 7.57838219081,48.1172002325,0 7.80221806588,48.5758269625,0 8.22608219347,48.9644181974,0 7.42555411159,49.1764540292,0 6.72923622052,49.1676360994,0 6.36217306579,49.459391039,0 6.52402711365,49.8077001882,0 6.2341631314,49.8975000434,0 6.13440926324,50.1278451369,0 6.39820016212,50.3231729857,0 6.27041821549,50.6198541375,0 6.01180012435,50.7572730935,0 6.0808361613,50.9147180926,0 5.86500014228,51.0453451925,0 6.09750005541,51.1311001088,0 6.22208212668,51.4673542372,0 5.9636092101,51.8066642399,0 6.82895421414,51.9757540495,0 6.73639118073,52.0766641174,0 7.05309116718,52.2377641293,0 7.06298214823,52.3909641973,0 6.68958227468,52.5505541255,0 7.05347321433,52.6495821208,0 7.20836307409,53.2428091404,0 7.3370821175,53.3230539613,0 7.01500011101,53.409854101,0 7.2958362806,53.6852730465,0 8.0143092182,53.708327136,0 8.09777319277,53.4444452096,0 8.28603627067,53.4208910558,0 8.33221821036,53.6152732583,0 8.49206311602,53.5558822774,0 8.48410014035,53.6863181022,0 8.65902710735,53.8926361349,0 9.0960452909,53.8666731897,0 9.28340010577,53.8555452074,0 9.82906317748,53.5417000972,0 9.27600927881,53.8818912055,0 8.88305408982,53.9611090756,0 9.01721818518,54.0850003104,0 8.82736304858,54.1516642687,0 8.88360913945,54.2941641668,0 8.60048219571,54.3263821911,0 9.01124524096,54.5034639777,0 8.54560922823,54.8706091075,0 8.28055433834,54.7749912056,0 8.40805415011,55.0565270965,0 8.42041812788,54.9196450852,0 8.66454508186,54.9130911075,0 9.44535423355,54.8254001391,0],3,[])';
@@ -459,66 +630,114 @@ pl=reshape([22.5580542245,49.0794361818,0 21.6126362287,49.4365272187,0 20.91360
 be=reshape([2.54166319863,51.0911090428,0 3.37086325679,51.373854107,0 3.43986325156,51.2447821855,0 3.89541801404,51.2056910007,0 4.23890019286,51.3504270229,0 4.32770008701,51.290127276,0 4.25236303814,51.3751450878,0 5.03847307305,51.4869450919,0 5.23897322671,51.2622820907,0 5.84713612726,51.1531911176,0 5.63881817249,50.8488820987,0 6.01180012435,50.7572730935,0 6.27041821549,50.6198541375,0 6.39820016212,50.3231729857,0 6.13440926324,50.1278451369,0 5.9730542739,50.170000075,0 5.74777319107,49.9074911044,0 5.89916310333,49.6627732262,0 5.80788233348,49.5450452048,0 5.47278222549,49.508882154,0 4.86847332403,49.8022182559,0 4.82472716541,50.1675641263,0 4.51055415514,49.9474912228,0 4.1492361245,49.9783731717,0 4.16500013748,50.2830541795,0 3.29708205679,50.5243001057,0 3.15857311809,50.7843642428,0 2.65055417947,50.8161090248,0 2.54166319863,51.0911090428,0],3,[])';
 fi=reshape([24.1670091586,65.8140272883,0 23.6625002258,66.3122092253,0 24.0007631611,66.8022821739,0 23.5733273369,67.1570091788,0 23.7651361275,67.4168733237,0 23.4308271036,67.4797821894,0 23.488818139,67.8709630971,0 23.6597911947,67.9458911091,0 22.826663209,68.3859631553,0 22.0486091889,68.4815181929,0 20.58092721,69.0603001758,0 21.0634732095,69.036800169,0 21.0302731615,69.2105452877,0 21.320827142,69.3261091017,0 21.6819451804,69.2847180902,0 22.3983271684,68.7111090827,0 23.1963911384,68.6298540749,0 23.9763911012,68.8324911109,0 24.934918226,68.5808092123,0 25.7611091809,68.989163131,0 25.7133361883,69.2552630765,0 25.983327181,69.7043000711,0 26.4768001648,69.9363822302,0 27.9106911716,70.0886091593,0 28.3797183347,69.8275001341,0 29.1275002732,69.6858181422,0 29.2984731612,69.4853360934,0 28.825418326,69.2361632337,0 28.9573362389,69.0516180328,0 28.4355542152,68.9026360737,0 28.8173542645,68.8470001854,0 28.4598541908,68.5348542546,0 28.6950002708,68.1954091356,0 29.3569453179,68.0824911532,0 30.0286091818,67.6947181597,0 29.075136177,66.9036001052,0 29.9037451434,66.1338822231,0 30.134927086,65.7088820124,0 29.8188820615,65.6533180408,0 29.6020452432,65.2444360623,0 29.869445222,65.1199911189,0 29.6211821341,65.0523540216,0 29.6408271359,64.9209631628,0 30.1427730503,64.7720732369,0 30.2068731521,64.663327263,0 29.9764542979,64.5789451348,0 30.0615272626,64.4053451907,0 30.5773541117,64.2237361705,0 30.5952732797,64.0469361834,0 29.998954176,63.7353360821,0 31.2197180272,63.2230541075,0 31.581963264,62.907900247,0 31.2581911305,62.5082541199,0 27.8078272821,60.5464001064,0 26.5636091893,60.4280540035,0 26.5690091466,60.5563541194,0 26.41652724,60.3916631326,0 26.0550631966,60.4227730692,0 26.0787452583,60.2940270361,0 25.8381911744,60.398463203,0 25.9216631956,60.2437451723,0 25.6575003078,60.3612452059,0 24.4725001935,59.9904180737,0 23.4315911979,59.9538181581,0 23.5375002328,60.0675632667,0 23.2493000583,59.8379182298,0 22.9002730829,59.8068000789,0 23.3356911612,60.0239540684,0 23.1092272241,59.9256542928,0 23.2548631275,60.0370821405,0 22.874445254,60.1455541938,0 23.0846541662,60.3452000639,0 22.5984632122,60.2204091156,0 22.5654732147,60.2119361849,0 22.5398730383,60.2186360078,0 22.449300204,60.2423541116,0 22.626591203,60.3804451286,0 21.3586092412,60.6536091746,0 21.554445201,61.3094361029,0 21.4688911151,61.5565272332,0 21.6638910638,61.5402730465,0 21.2845821162,61.9463822914,0 21.3716632172,62.2599911996,0 21.0659731959,62.5979820584,0 21.4355542744,63.0347182747,0 21.6766002084,63.0201361101,0 21.4968732607,63.2035361754,0 22.3400001863,63.2765269619,0 22.1878451739,63.4451361532,0 22.2881911397,63.5256912721,0 23.3188820925,63.8966632435,0 24.3393001847,64.5216632083,0 24.5395822412,64.7991541604,0 25.3194452437,64.8177629913,0 25.1893002709,64.9640181496,0 25.444236192,64.9533912375,0 25.2675002426,65.170000068,0 25.3037451008,65.515136164,0 24.6691632796,65.6547091015,0 24.5535360984,65.7620001446,0 24.6891631711,65.8961000346,0 24.1670091586,65.8140272883,0],3,[])';
 cz=reshape([18.8512452096,49.5173542465,0 18.5659002466,49.4936731907,0 17.7122181579,48.8561090883,0 17.1879091581,48.8694451992,0 16.9461822783,48.619064172,0 16.5405541546,48.8123542125,0 16.1033361464,48.7500000611,0 15.0286091888,49.0187451677,0 14.7002821615,48.5813821527,0 13.8336092964,48.7736090326,0 12.6744452253,49.4250002578,0 12.4555543378,49.6955451266,0 12.5459731127,49.9095822216,0 12.0937002006,50.3225361287,0 12.3230542179,50.206664196,0 12.5154180581,50.3924911575,0 12.985554147,50.4183272007,0 14.3113911898,50.8822181011,0 14.3062452041,51.0524911002,0 14.8283361848,50.8658271218,0 15.1769450708,51.0147180534,0 15.379718229,50.7794450715,0 16.3320092179,50.6640272702,0 16.447363149,50.5788180158,0 16.2190271977,50.4102731975,0 16.6400002392,50.1088911392,0 17.002218151,50.2169451031,0 16.8909731965,50.4386730972,0 17.7244451754,50.3190271287,0 17.6577731704,50.1080541223,0 18.578745178,49.9122181625,0 18.8512452096,49.5173542465,0],3,[])';
-l ={fr,de,ch,nl,se,pl,be,fi,cz};
+l ={fr,pl,fi};
 
 
 dlat = lldistkm([g.lat(1) g.lon(1)],[g.lat(2) g.lon(1)]);
 dlon = lldistkm([g.lat2D(:,1) g.lon2D(:,1)],[g.lat2D(:,1) g.lon2D(:,2)]);
 area = repmat(dlon*dlat,1,g.nlon,2017);
-area( repmat(~g.mask_water | ~g.mask_distrad,1,1,2017))=nan;
-area(~g.mask_rain)=0;
 
-g_denstrans_est=g.denstrans_est;
-g_denstrans_est(~g.mask_rain) = nan;
-g_denstrans_est = g_denstrans_est.^(1/pow_a);
-g_dens_p10 = (g_denstrans_est+norminv(.1).*g.denstrans_sig).^(1/pow_a);
-g_dens_p90 = (g_denstrans_est+norminv(.9).*g.denstrans_sig).^(1/pow_a);
-
-l_dens_est_avg=nan(numel(l),g.nt);
-l_dens_q10_avg=l_dens_est_avg;
-l_dens_q90_avg=l_dens_est_avg;
-
+sum_sim = nan(g.nt, size(real_dens_ll,3));
+ssum=nan(g.nt,size(real_dens_ll,3),numel(l));
 for i_l=1:numel(l)
     in = repmat(inpolygon(g.lat2D,g.lon2D,l{i_l}(:,2),l{i_l}(:,1)),1,1,g.nt);
-    l_dens_est_avg(i_l,:)=nansum(reshape(g.dens_est(in),[],g.nt) .* reshape(area(in),[],g.nt),1); %  / sum(area(in)
-    l_dens_q10_avg(i_l,:)=nansum(reshape(g.dens_q10(in),[],g.nt) .* reshape(area(in),[],g.nt),1);
-    l_dens_q90_avg(i_l,:)=nansum(reshape(g.dens_q90(in),[],g.nt) .* reshape(area(in),[],g.nt),1);
+    for i_real=1:size(real_dens_ll,3)
+        tmp=nan(g.nlat,g.nlon,g.nt);
+        tmp(repmat(g.latlonmask,1,1,g.nt))=real_dens_ll(:,:,i_real);
+        tmp(~g.mask_rain)=0;
+        tmp(~in)=nan;
+        sum_sim(:,i_real) = reshape(nansum( nansum(tmp.*area,1),2),[],1);
+    end
+    ssum(:,:,i_l)=sort(sum_sim,2);
+end 
+
+for i_real=1:size(real_dens_ll,3)
+    tmp=nan(g.nlat,g.nlon,g.nt);
+    tmp(repmat(g.latlonmask,1,1,g.nt))=real_dens_ll(:,:,i_real);
+    tmp(~g.mask_rain)=0;
+    sum_sim(:,i_real) = reshape(nansum( nansum(tmp.*area,1),2),[],1);
 end
+ssumg=sort(sum_sim,2);
 
 
-% plot(l_dens_est_avg')
-% legend('fr','de','ch','nl','se','pl','be','fi','cz')
-
-figure('position',[0 0 1000 400]);   hold on;
-i_l=1;
-fill([g.time fliplr(g.time)]', [l_dens_q10_avg(i_l,:)' ; flipud(l_dens_q90_avg(i_l,:)')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5)
-a=l_dens_est_avg(i_l,:); a(a==0)=nan;
-plot(g.time,a,'k','linewidth',2);
-% i_l=2;
-% fill([g.time fliplr(g.time)]', [l_dens_p10_avg(i_l,:)' ; flipud(l_dens_p90_avg(i_l,:)')],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5)
-% a=l_dens_est_avg(i_l,:); a(a==0)=nan;
-plot(g.time,a,'k','linewidth',2);
+co=[51,34,136;136,204,238;68,170,153;17,119,51;153,153,51;221,204,119;204,102,119;136,34,85;170,68,153]/255;
+figure('position',[0 0 1000 400]);
+subplot(2,3,[2 3]); hold on;
+fill([g.time fliplr(g.time)]', [ssumg(:,10) ; flipud(ssumg(:,90))],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5)
+plot(g.time,mean(ssumg,2),'k','linewidth',2);
+xlabel('Date'); ylabel('Total number of bird'); box on
+axis tight
+subplot(2,3,[5 6]); hold on;
+for i_l=1:numel(l)
+    fill([g.time fliplr(g.time)]', [ssum(:,10,i_l) ; flipud(ssum(:,90,i_l))],[.7 .7 .7],'EdgeColor','none','FaceAlpha',.5)
+    plot(g.time,mean(ssum(:,:,i_l),2),'Color',co(i_l*2,:),'linewidth',2);
+end
 xlabel('Date'); ylabel('Total number of bird'); box on
 axis tight
 
-figure('position',[0 0 1000 400]);  hold on
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-plotm(g.lat2D(in), g.lon2D(in),'.');
-
-
-%
-figure('position',[0 0 1000 400]); 
-worldmap([min([g.lat]) max([g.lat])], [min([g.lon]) max([g.lon])]); 
+subplot(2,3,[1 4]); hold on;
+worldmap([min([g.lat]) max([g.lat])], [min([g.lon]) max([g.lon])]); hold on;
 %plotm(coastlat, coastlon,'k');
 geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
 geoshow('worldrivers.shp','Color', 'blue')
-plotm(l{i_l}(:,2),l{i_l}(:,1));
-a=g.latlonmask+1;
-a(a==1)=nan;
-surfm(g.lat2D,g.lon2D,a);
-plotm(g.lat(ix),g.lon(iy),'o')
+for i_l=1:numel(l)
+    plotm(l{i_l}(:,2),l{i_l}(:,1),'Color',co(i_l*2,:),'linewidth',2);
+end
+
+
+%% Figure Result: Daily average
+avg=nan(g.nlat,g.nlon,g.nat-2,size(real_dens_ll,3));
+for i_real=1:size(real_dens_ll,3)
+    tmp=nan(g.nlat,g.nlon,g.nt);
+    tmp(repmat(g.latlonmask,1,1,g.nt))=real_dens_ll(:,:,i_real);
+    tmp(~g.mask_rain)=0;
+    for i_at=1:g.nat-2
+       avg(:,:,i_at,i_real) = nanmean(tmp(:,:,((i_at-1)*4*24+1+12*4):(i_at*4*24+12*4)),3);
+    end
+end
+
+avg2 = mean(avg,4);
+
+avg2(~repmat(g.latlonmask,1,1,g.nat-2))=nan;
+
+
+figure('position',[0 0 1000 400]); 
+for i_at=1:g.nat-2
+    subplot(3,7,i_at)
+    worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
+    geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+    geoshow('worldrivers.shp','Color', 'blue')
+     %caxis([min(log10(g_dens_a_avg(:))) max(log10(g_dens_a_avg(:)))])
+    caxis(log10([1 150]))
+
+    h=surfm(g.lat2D,g.lon2D,log10(avg2(:,:,i_at)));
+   % print(['paper/figure/Spatial_daily_' num2str(i_at) '.eps'],'-depsc')
+   % delete(h)
+end
+
+%% Global map average
+
+avg=nan(g.nlat,g.nlon,size(real_dens_ll,3));
+for i_real=1:size(real_dens_ll,3)
+    tmp=nan(g.nlat,g.nlon,g.nt);
+    tmp(repmat(g.latlonmask,1,1,g.nt))=real_dens_ll(:,:,i_real);
+    tmp(~g.mask_rain)=0;
+    avg(:,:,i_real) = nanmean(tmp,3);
+end
+
+avg2 = mean(avg,3);
+avg2(~g.latlonmask)=nan;
+
+figure('position',[0 0 1000 400]); 
+worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
+geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+geoshow('worldrivers.shp','Color', 'blue')
+surfm(g.lat2D,g.lon2D,log10(avg2))
+caxis(log10([1 100]))
+
+
+
+
 
 
 %% Figure 7: Result Estimation Map
@@ -615,160 +834,6 @@ ylim([0 150]); box on;
 
 % export_fig 'figure/paper/estimation2.eps' -eps
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%% APPENDIX
-
-
-%% Figure: histogram raw data
-figure('position',[0 0 1000 400]);
-subplot(2,1,1)
-histogram(data.dens); xlabel('Histogram of bird density Z [bird/km^2]'); axis tight;
-subplot(2,1,2); hold on; box on;
-histogram(data.denstrans); xlabel('Histogram of transformed bird density Z^p')
-plot(.4:.01:2.4, 1150.*normpdf(.4:.01:2.4,mean(data.denstrans), std(data.denstrans)),'k','linewidth',2);
-
-% export_fig 'paper/figure/Appendix/Appendix_histogram.eps' '-eps'
-% print('paper/figure/Appendix/Appendix_histogram.png', '-r600', '-dpng')
-
-%% Figure: trend
-
-S=zeros(numel(dc), 1);
-for i=1:numel(dc)
-    S(i)=mean(data.denstrans(data.i_r==i));
-end
-
-figure('position',[0 0 1000 400]);  
-subplot(1,2,1); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
-[LAT,LON] = meshgrid(min([dc.lat]):max([dc.lat]),min([dc.lon]):max([dc.lon]));
-surfm(LAT,LON,LAT*trend.p(1)+trend.p(2))
-plotm(coastlat, coastlon,'k')
-geoshow('worldrivers.shp','Color', 'blue')
-scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,S,'filled','MarkerEdgeColor','k'); %title('fitted planar trend with average of radar'); 
-colorbar
-
-% subplot(1,3,1); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
-% geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-% geoshow('worldrivers.shp','Color', 'blue')
-% scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,S,'filled','MarkerEdgeColor','k'); %title('fitted planar trend with average of radar'); 
-
-subplot(1,2,2); hold on; worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-scatterm([dc.lat],[dc.lon],[dc.maxrange]*4,S-trend.t,'filled','MarkerEdgeColor','k'); % title('Residual average of radar');
-colorbar
-
-
-%% Figure: curve
-figure('position',[0 0 1000 400]);   hold on;
-x=(-1:.01:1)';
-y=polyval( curve.p, x);
-z=sqrt(polyval( res.p, x));
-
-fill([x ; flipud(x)], [y-3*z ; flipud(y+3*z)],[.9 .9 .9],'EdgeColor','none')
-fill([x ; flipud(x)], [y-2*z ; flipud(y+2*z)],[.8 .8 .8],'EdgeColor','none')
-fill([x ; flipud(x)], [y-1*z ; flipud(y+1*z)],[.7 .7 .7],'EdgeColor','none')
-c=data.denstrans-trend.t(data.i_r)-ampli.A(data.dateradar);
-plot(data.scoret(1:4:end),c(1:4:end),'.k','MarkerSize',0.5);
-plot(x,y,'-k','linewidth',2)
-xlabel('Normalized Night Time (NNT)'); ylabel('Normalized Bird density');  box on;
-
-%% Figure 6: Cleaning
-load('./data/d.mat');
-load('./data/dc_corr.mat')
-
-fig0=figure('position',[0 0 1000 400]); 
-
-i_dc=find(strcmp({dc.name},'dedrs'));
-
-for i_dc=1:numel(dc)
-    clf;
-    i_d=find(strcmp({d.name},dc(i_dc).name));
-    subplot(3,1,1); hold on;
-    imagesc(datenum(d(i_d).time), d(i_d).interval/1000*(1/2:double(d(i_d).levels)), (d(i_d).DBZH)','AlphaData',~isnan(d(i_d).DBZH'))
-    xlabel('Date'); ylabel('Altitude [km]'); c=colorbar; c.Label.String='Raw reflectivity'; %caxis([0 5])
-    datetick('x','dd mmm'); axis([datenum(start_date) datenum(end_date-1) 0 5]); set(gca, 'YDir', 'normal')
-    
-    subplot(3,1,2); hold on;
-    imagesc(datenum(d(i_d).time), d(i_d).interval/1000*(1/2:double(d(i_d).levels)), log10(d(i_d).dens)','AlphaData',~isnan(d(i_d).dens'))
-    %plot([datenum(start_date) datenum(end_date)],[d(i_d).height d(i_d).height],'r','linewidth',2); caxis([-5 5])
-    xlabel('Date'); ylabel('Altitude [km]'); c=colorbar; c.Label.String='Bird Density [Log bird/km^3]'; caxis([0 max(log10(dc(i_dc).dens(:)))])
-    datetick('x','dd mmm'); axis([datenum(start_date) datenum(end_date-1) 0 5]); set(gca, 'YDir', 'normal')
-    
-    subplot(3,1,3); hold on;
-    imagesc(datenum(dc(i_dc).time), dc(i_dc).interval/1000*(1/2:double(dc(i_dc).levels)), log10(dc(i_dc).dens)', 'AlphaData',~isnan(dc(i_dc).dens)')
-    rectangle('Position',[0 -1 datenum(end_date+2) 1+dc(i_dc).height/1000], 'FaceColor',[1 1 1],'EdgeColor','k','LineWidth',2)
-    xlabel('Date'); ylabel('Altitude [km]'); c=colorbar; c.Label.String='Bird Density [Log bird/km^3]'; caxis([0 max(log10(dc(i_dc).dens(:)))])
-    datetick('x','dd mmm'); axis([datenum(start_date) datenum(end_date-1) 0 5]); set(gca, 'YDir', 'normal')
-    %keyboard
-    print(['paper/figure/cleaning/' num2str(i_dc) ,'_', dc(i_dc).name '.png'],'-dpng', '-r300')
-end
-
-% export_fig 'figure/paper/clenaning.eps' -eps
-
-
-
-%% Figure Result: Daily average
-g_denstrans_est=g.dens_est;
-g_denstrans_est(~g.mask_rain)=nan;
-g_dens_a_avg = nan(g.nlat,g.nlon,g.nat-1);
-
-for i_at=1:g.nat-1
-   g_dens_a_avg(:,:,i_at) = nanmean(g_denstrans_est(:,:,((i_at-1)*4*24+1):(i_at*4*24)),3);
-end
-
-figure('position',[0 0 1400 1400]); hold on;
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
- %caxis([min(log10(g_dens_a_avg(:))) max(log10(g_dens_a_avg(:)))])
-caxis(log10([1 150]))
-for i_at=1:g.nat-1
-    h=surfm(g.lat2D,g.lon2D,log10(g_dens_a_avg(:,:,i_at)));
-   % print(['paper/figure/Spatial_daily_' num2str(i_at) '.eps'],'-depsc')
-   delete(h)
-end
-
-
-
-%% Figure Result: Nightly variation
-
-it=1652+(1:4:4*14)-24*4;
-
-figure('position',[0 0 1400 1400]); hold on;    
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]); 
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-caxis(log10([1 150]))
-
-for i_t=1:length(it)
-    h=surfm(g.lat2D,g.lon2D,log10(g.dens_est(:,:,it(i_t))));
-    print(['paper/figure/Spatial_hourly_' num2str(i_t) '.eps'],'-depsc')
-    %keyboard
-    delete(h)
-end
 
 
 

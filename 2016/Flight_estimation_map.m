@@ -109,6 +109,58 @@ guv.v_q10 = guv.v_est .* norminv(.1).*guv.v_sig;
 guv.u_q90 = guv.u_est .* norminv(.9).*guv.u_sig;
 guv.v_q90 = guv.v_est .* norminv(.9).*guv.v_sig;
 
+%% Figure
+u=guv.u_est;
+v=guv.v_est;
+u_isnan=single(~isnan(guv.u_est));
+v_isnan=single(~isnan(guv.v_est));
+u(isnan(u))=0;
+v(isnan(v))=0;
+
+rzd=1/4;
+lat2D_res=imresize(g.lat2D,rzd);
+lon2D_res=imresize(g.lon2D,rzd);
+
+h=figure(2);  
+worldmap([min(g.lat) max(g.lat)], [min(g.lon) max(g.lon)]);  
+filename='data/Flight_estimationMap';
+mask_fullday = find(~reshape(all(all(isnan(guv.u_est),1),2),g.nt,1));
+Frame(numel(mask_fullday)-1) = struct('cdata',[],'colormap',[]); 
+geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+geoshow('worldrivers.shp','Color', 'blue')
+set(gcf,'color','w');
+for i_t = 1:numel(mask_fullday)
+
+    u_res = imresize(u(:,:,mask_fullday(i_t)),rzd);
+    u_isnan_res = imresize(u_isnan(:,:,mask_fullday(i_t)),rzd);
+    u_res=u_res./u_isnan_res;
+    u_res(u_isnan_res<0.5)=nan;
+
+    v_res = imresize(v(:,:,mask_fullday(i_t)),rzd);
+    v_isnan_res = imresize(v_isnan(:,:,mask_fullday(i_t)),rzd);
+    v_res=v_res./v_isnan_res;
+    v_res(v_isnan_res<0.5)=nan;
+    
+    hsurf=quiverm(lat2D_res,lon2D_res,u_res,v_res,'k');
+    
+    drawnow
+    title(datestr(g.time(mask_fullday(i_t)))); drawnow;
+    Frame(i_t) = getframe(h);
+    [imind,cm] = rgb2ind(frame2im(Frame(i_t)),256); 
+    if i_t == 1
+        imwrite(imind,cm,[filename '.gif'],'gif', 'Loopcount',inf,'DelayTime',0.1);
+    else
+        imwrite(imind,cm,[filename '.gif'],'gif','WriteMode','append','DelayTime',0.1);
+    end
+    delete(hsurf);
+end
+
+v=VideoWriter([filename '.avi']);
+v.FrameRate = 4;
+v.Quality = 75;
+open(v);
+writeVideo(v, Frame);
+close(v);
 
 %%  Save
 %

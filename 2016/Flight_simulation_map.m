@@ -227,35 +227,54 @@ real_v_ll = single(real_vn_ll *uv.trans.std(2) + uv.trans.mean(2));
 
 save('data/Flight_simulationMap_real_ll','real_u_ll','real_v_ll','-v7.3');
 
+%% Figure
 i_real=1;
 
+u = nan(g.nlat,g.nlon,g.nt);
+v = nan(g.nlat,g.nlon,g.nt);
+u(repmat(g.latlonmask,1,1,g.nt)) = real_u_ll(:,:,i_real);
+v(repmat(g.latlonmask,1,1,g.nt)) = real_v_ll(:,:,i_real);
+
+u(isnan(u))=0;
+v(isnan(v))=0;
+
+rzd=1/4;
+lat2D_res=imresize(g.lat2D,rzd);
+lon2D_res=imresize(g.lon2D,rzd);
+
 h=figure(2);  
-worldmap([min([dc.lat]) max([dc.lat])], [min([dc.lon]) max([dc.lon])]);  
-filename='data/Density_simulationMap_residu';
-mask_fullday = find(~reshape(all(all(isnan(real_u(:,:,:,i_real)),1),2),g.nt,1));
+worldmap([min(g.lat) max(g.lat)], [min(g.lon) max(g.lon)]);  
+filename='data/Flight_simulationMap';
+mask_fullday = find(~reshape(all(all(isnan(guv.u_est),1),2),g.nt,1));
 Frame(numel(mask_fullday)-1) = struct('cdata',[],'colormap',[]); 
-hcoast=plotm(coastlat, coastlon,'k'); caxis([-3 3]); hscat=[];
+geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
+geoshow('worldrivers.shp','Color', 'blue')
+set(gcf,'color','w');
+
 for i_t = 1:numel(mask_fullday)
 
-    hsurf=quiverm(g.lat2D,g.lon2D,real_u(:,:,mask_fullday(i_t),i_real),real_v(:,:,mask_fullday(i_t),i_real));
+    u_res = imresize(u(:,:,mask_fullday(i_t)),rzd);
+    u_isnan_res = imresize(u_isnan(:,:,mask_fullday(i_t)),rzd);
+    u_res=u_res./u_isnan_res;
+    u_res(u_isnan_res<0.5)=nan;
 
-%     gtit = datenum(g.time(mask_fullday(i_t)+([-1 0 1])));
-%     id = find(mean(gtit(1:2))<data.time & mean(gtit(2:3))>data.time);
-%     if sum(id)>0
-%         G = findgroups(data.dateradar(id));
-%         hscat=scatterm(splitapply(@mean,data.lat(id),G),splitapply(@mean,data.lon(id),G),[],splitapply(@mean,res.rn(id),G),'filled','MarkerEdgeColor','k');
-%     end
-%     uistack(hcoast,'top')
+    v_res = imresize(v(:,:,mask_fullday(i_t)),rzd);
+    v_isnan_res = imresize(v_isnan(:,:,mask_fullday(i_t)),rzd);
+    v_res=v_res./v_isnan_res;
+    v_res(v_isnan_res<0.5)=nan;
+    
+    hsurf=quiverm(lat2D_res,lon2D_res,u_res,v_res,'k');
+    
     drawnow
     title(datestr(g.time(mask_fullday(i_t)))); drawnow;
-%     Frame(i_t) = getframe(h);
-%     [imind,cm] = rgb2ind(frame2im(Frame(i_t)),256); 
-%     if i_t == 1
-%         imwrite(imind,cm,[filename '.gif'],'gif', 'Loopcount',inf);
-%     else
-%         imwrite(imind,cm,[filename '.gif'],'gif','WriteMode','append');
-%     end
-    delete(hsurf); delete(hscat);
+    Frame(i_t) = getframe(h);
+    [imind,cm] = rgb2ind(frame2im(Frame(i_t)),256); 
+    if i_t == 1
+        imwrite(imind,cm,[filename '.gif'],'gif', 'Loopcount',inf,'DelayTime',0.1);
+    else
+        imwrite(imind,cm,[filename '.gif'],'gif','WriteMode','append','DelayTime',0.1);
+    end
+    delete(hsurf);
 end
 
 v=VideoWriter([filename '.avi']);
@@ -264,3 +283,4 @@ v.Quality = 75;
 open(v);
 writeVideo(v, Frame);
 close(v);
+

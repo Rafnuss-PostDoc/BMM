@@ -18,7 +18,7 @@ for i_d=1:numel(d)
 end
 
 
-for i_d=23:numel(d)
+for i_d=1:numel(d)
     
     d(i_d).time = [];d(i_d).stime = [];d(i_d).etime = [];
     for i_quantity = 1:numel(quantity)

@@ -8,7 +8,10 @@
 folder = 'SinkSource_estimationMap_ImageOverlay/';
 load('data/SinkSourceSim.mat','W')
 data=W;
-min_d=-20; max_d=20;
+min_d=-15; max_d=15;
+gold=g;
+g = gext;
+g.time=gold.time;
 
 % folder ='Density_simulationMap_ImageOverlay/';
 % load('data/Density_simulationMap')
@@ -23,7 +26,8 @@ data(data<0)=0;
 data(data>1)=1;
 
 cm=viridis(255);
-
+% cm=colormap(brewermap([],'Spectral'))
+% cm = interp1(linspace(1,255,64),cm,1:255);
 
 % Rain
 % load total column rain water (kg/m^2)
@@ -36,7 +40,7 @@ cm=viridis(255);
 
 for i=1:size(data,3)
     if (sum(sum(data(:,:,i)))==0 || all(all(isnan(data(:,:,i)))) )
-        copyfile('./BMM_web/blank.png',['./BMM_web/' folder datestr(g.time(i),'yyyy-mm-dd-HH-MM') '_3857.png'])
+        copyfile('./BMM_web/blank_sinksource.png',['./BMM_web/' folder datestr(g.time(i),'yyyy-mm-dd-HH-MM') '_3857.png'])
     else
         img = flipud(data(:,:,i));
         img_nan=isnan(img);

@@ -374,7 +374,12 @@ gd.dens_q10 = ( gd.denstrans_est+norminv(.1).*gd.denstrans_sig ).^(1/pow_a);
 gd.dens_q90 = ( gd.denstrans_est+norminv(.9).*gd.denstrans_sig ).^(1/pow_a);
 
 
-% Figure
+%% Save
+save('data/Density_estimationMap','g','gampli','gres','gd','-v7.3')
+% load('data/Density_estimationMap')
+
+
+%% Figure
 fig=figure(2);  
 % filename='data/Density_estimationMap_reassamble_05102016';
 % mask_fullday = 1553:1609;
@@ -416,6 +421,3 @@ open(v);
 writeVideo(v, Frame);
 close(v);
 
-%% Save
-save('data/Density_estimationMap','g','gampli','gres','gd','-v7.3')
-% load('data/Density_estimationMap')
