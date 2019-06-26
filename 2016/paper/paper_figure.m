@@ -1,10 +1,15 @@
+%% Script to generate figures for "A geostatistical approach to estimate high resolution nocturnal bird migration densities from a weather radar network"
+% 
+
 %% Load data
 clear all; load coastlines; addpath('./functions/');
-load('./data/dc_corr.mat'); load('data/Density_modelInf.mat'); load('data/Density_estimationMap')
+load('./data/dc_corr.mat'); 
+load('data/Density_modelInf.mat'); 
+load('data/Density_estimationMap')
 load('./data/Density_simulationMap_reassemble_ll.mat')
 
 
-%% Figure 2: Radar availability
+%% Figure 1: Radar availability
 % load('./data/d_all.mat')
 % 
 % for i_d=1:numel(d)
