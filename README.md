@@ -43,10 +43,12 @@ code: [MATLAB LiveScript](https://rafnuss-postdoc.github.io/BMM/2016/html/Densit
 ### Flight Speed and Direction [m/s]
 Bird flight (speed and direction) is modeled by its two componants (south-north and east-west). The resulting vectoriel field can be assumed stationary and thus, does not requires the same complex decomposition as bird density, but only a transformation ([LambertW](https://arxiv.org/abs/1010.2265)). As the cross-covariance was relatively small (~2x smaller than each covariance) and because both componants are always known, the kriging was done separatly for each one.   
 
-code: [MATLAB](https://rafnuss-postdoc.github.io/BMM/2016/html/Flight_inference_cross-validation)
+code: [MATLAB](BMM/2016/html/Flight_inference_cross-validation)
 
 ## Data
-The data used in this study are found on the repository of [European Network for the Radar surveillance of Animal Movement (ENRAM)](http://enram.github.io/data-repository/). See also [vol2bird](https://github.com/adokter/vol2bird) for the processing of the row data.
+The raw data used in this study are found on the repository of [European Network for the Radar surveillance of Animal Movement (ENRAM)](http://enram.github.io/data-repository/) and were generated with [vol2bird](https://github.com/adokter/vol2bird).
+These data were cleaned manually into vertical profile of reflectivity. These data are available on zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243397.svg)](https://doi.org/10.5281/zenodo.3243397)
+The final interpolated spatio-temporal map can also be downloaded from zenodo 
 
 
 ## Result
