@@ -4,7 +4,7 @@
 BMM use classical geostatistical methods (i.e. kriging) to quantify nocturnal bird migration across Europe based on weather radar observations.
 
 ## Demo
-[<img src="2016/figure/FigureS5-3.PNG">](https://bmm.raphaelnussbaumer.com/)
+[<img src="2016/figure/FigureS5-3.png">](https://bmm.raphaelnussbaumer.com/)
 
 
 ## Methodolgy
@@ -21,7 +21,7 @@ where the power-$$p$$ transform of the bird density $$Z$$ over time $$t$$ and sp
 * $$c\left(\bf{s},t\right)$$: a bell-shape curve explaining the variation during the night, fixed for all nights and all places.
 * $$R\left(\bf{s},t\right)$$: a residual term accounting for sub-daily fluctuations.
 
-<img src="2016/paper/figure/mathematical_model_2.png">
+<img src="2016/figure/mathematical_model_2.png">
 
 | Trend  | Amplitude | Curve  | Residual |
 | ------------- | ------------- | ------------- | ------------- |
