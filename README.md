@@ -4,7 +4,7 @@
 BMM use classical geostatistical methods (i.e. kriging) to quantify nocturnal bird migration across Europe based on weather radar observations.
 
 ## Demo
-[<img src="2016/figure/screenshot.PNG">](https://bmm.raphaelnussbaumer.com/)
+[<img src="2016/figure/FigureS5-3.PNG">](https://bmm.raphaelnussbaumer.com/)
 
 
 ## Methodolgy
