@@ -1,9 +1,8 @@
 *.asv
-*/data/*
-*/BMM_web/*
 *.mat
 *.m~
-2016/BMM_web/*
+2016/7-export/BMM_web/*
+2016/7-export/zenodo/*
 
 # Windows image file caches
 Thumbs.db
