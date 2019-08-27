@@ -34,16 +34,23 @@ Modelisation is perform as such
 3. The curve $$\iota$$ is a polynomial of the sixth degree. 
 3. The amplitude is transformed with a normal score and then, a Gneiting covariance model is fitted to the data.
 4. Similarly to the amplitude, the residual (data minus model fitted in 2.) is also transform into a Gaussian variable and another Gneiting covariance function is fitted. 
+
 [MATLAB LiveScript](https://rafnuss-postdoc.github.io/BMM/2016/html/Inference.html)
 
 ### Validation
 Validation is performed by (1) Cross-validation for each radar by ignoring the data of this radar for all time and estimating the bird density at the same location and time and (2) comparaison to Birdscan radars.
+
 [MATLAB LiveScript of cross-validation](https://rafnuss-postdoc.github.io/BMM/2016/html/Cross_validation.html)
+
 [MATLAB LiveScript of validation with bird radar](https://rafnuss-postdoc.github.io/BMM/2016/html/Validation_birdRadar.html)
+
+[MATLAB LiveScript of cross-validation with simple interpolation](https://rafnuss-postdoc.github.io/BMM/2016/html/Compare_interpolation.html)
 
 ### Estimation and simulation
 Estimation and simulation are possible by computing each componenent of the model separatly and reassemble them. The two Gaussian process (amplitude and residu) are estimated/simulated using Kriging. 
+
 [MATLAB code of estimation](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2016/4-Estimation/Estimation_map.m)
+
 [MATLAB code of simulation](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2016/5-Simulation/Simulation_map.m)
 
 ## Flight Speed and Direction
