@@ -7,9 +7,9 @@ BMM use classical geostatistical methods (i.e. kriging) to quantify nocturnal bi
 [<img src="2016/figure/FigureS5-3.png">](https://bmm.raphaelnussbaumer.com/)
 
 
-## Methodolgy
+## Bird density
 
-### Bird density [bird/km<sup>2</sup>]
+### Model description
 
 The proposed model is as follows,
 
@@ -27,23 +27,37 @@ where the power-$$p$$ transform of the bird density $$Z$$ over time $$t$$ and sp
 | ------------- | ------------- | ------------- | ------------- |
 |  <img src="2016/figure/trend.png"> | <img src="2016/figure/Density_estimationMap_amplitude.gif">  | <img src="2016/figure/curve.png">  | <img src="2016/figure/Density_estimationMap_residu.gif">  |
 
-
+### Inference
 Modelisation is perform as such
-1. Find the optimal power transform of the data which lead to the most gaussian distributed transformed variable using the [Kolmogorov-Smirnov test](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test)
-2. Fit alltogether the parameters for daily amplitude, plane trend and the curve on the data. The amplitude has a different value for each day of each radars. The trend has 3 variables: the slopes in latitude and longitude and the intercept. Finally, the curve is a polynomial of the sixth degree. 
+1. The optimal power transform $$p$$ is determined to produce a Gaussian distributed transformed variable $$B^p$$ as quantified by the  [Kolmogorov-Smirnov test](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test)
+2. The spatial trend $$\nu$$ is fitted with OLS.
+3. The curve $$\iota$$ is a polynomial of the sixth degree. 
 3. The amplitude is transformed with a normal score and then, a Gneiting covariance model is fitted to the data.
 4. Similarly to the amplitude, the residual (data minus model fitted in 2.) is also transform into a Gaussian variable and another Gneiting covariance function is fitted. 
 
-Estimation and simulation are possible by computing each componenent of the model separatly and reassemble them. The two Gaussian process (amplitude and residu) are estimated/simulated using Kriging. 
+[MATLAB LiveScript](https://rafnuss-postdoc.github.io/BMM/2016/html/Inference.html)
 
+### Validation
 Validation is performed by (1) Cross-validation for each radar by ignoring the data of this radar for all time and estimating the bird density at the same location and time and (2) comparaison to Birdscan radars.
 
-code: [MATLAB LiveScript](https://rafnuss-postdoc.github.io/BMM/2016/html/Density_inference_cross_validation.html)
+[MATLAB LiveScript of cross-validation](https://rafnuss-postdoc.github.io/BMM/2016/html/Cross_validation.html)
 
-### Flight Speed and Direction [m/s]
-Bird flight (speed and direction) is modeled by its two componants (south-north and east-west). The resulting vectoriel field can be assumed stationary and thus, does not requires the same complex decomposition as bird density, but only a transformation ([LambertW](https://arxiv.org/abs/1010.2265)). As the cross-covariance was relatively small (~2x smaller than each covariance) and because both componants are always known, the kriging was done separatly for each one.   
+[MATLAB LiveScript of validation with bird radar](https://rafnuss-postdoc.github.io/BMM/2016/html/Validation_birdRadar.html)
 
-## Data
+[MATLAB LiveScript of cross-validation with simple interpolation](https://rafnuss-postdoc.github.io/BMM/2016/html/Compare_interpolation.html)
+
+### Estimation and simulation
+Estimation and simulation are possible by computing each componenent of the model separatly and reassemble them. The two Gaussian process (amplitude and residu) are estimated/simulated using Kriging. 
+
+[MATLAB code of estimation](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2016/4-Estimation/Estimation_map.m)
+
+[MATLAB code of simulation](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2016/5-Simulation/Simulation_map.m)
+
+## Flight Speed and Direction
+Bird flight (speed and direction) is modeled by its two componants (south-north and east-west). The resulting vectoriel field can be assumed stationary and thus, does not requires the same complex decomposition as bird density. As the cross-covariance was relatively small (~2x smaller than each covariance) and because both componants are always known, the kriging was done separatly for each one.
+
+
+## Dataset
 - The raw data used in this study are found on the repository of [European Network for the Radar surveillance of Animal Movement (ENRAM)](http://enram.github.io/data-repository/) and were generated with [vol2bird](https://github.com/adokter/vol2bird).
 - These data were cleaned manually into vertical profile of reflectivity. These data are available on zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243397.svg)](https://doi.org/10.5281/zenodo.3243397)
 - The final interpolated spatio-temporal map can also be downloaded from zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243397.svg)](https://doi.org/10.5281/zenodo.3243397).
