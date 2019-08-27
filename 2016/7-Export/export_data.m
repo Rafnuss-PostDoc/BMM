@@ -1,15 +1,18 @@
-load('data/Flight_estimatiotnMap');
 load('data/Density_estimationMap');
+load('data/Flight_estimatiotnMap');
+
+load('./data/Flight_inference.mat'); 
+
 load('data/Density_modelInf.mat','pow_a')
 addpath('./functions/')
 
-%% Export for Zenodo
-load('data\dc_corr.mat')
+%% Export raw data (Zenodo)
+load('../1-Cleaning/data/dc_corr.mat'); 
 for i_d=1:numel(dc)
     dc(i_d).alt=dc(i_d).interval*(1:dc(i_d).levels)-dc(i_d).interval/2;
 end
 
-dc_zenodo = rmfield(dc,[{'date','stime','etime','n_all','DBZH','w','ff','dd','scoret','interval','levels', 'cc', 't', 'crwc'} q.s]); 
+dc_zenodo = rmfield(dc,[{'date','stime','etime','n_all','DBZH','w','ff','dd','NNT','interval','levels', 'cc', 't', 'crwc'} q.s]); 
 
 for i_d=1:numel(dc_zenodo)
     
@@ -20,10 +23,14 @@ for i_d=1:numel(dc_zenodo)
     dc_zenodo(i_d).vs = round(dc_zenodo(i_d).vs,2);
     dc_zenodo(i_d).denss = round(dc_zenodo(i_d).denss,2);
     
-    fileID = fopen(['data/zenodo/dc_' dc_zenodo(i_d).name '.json'],'w');
+    fileID = fopen(['./zenodo/dc_' dc_zenodo(i_d).name '.json'],'w');
     fprintf(fileID,jsonencode(dc_zenodo(i_d)));
     fclose(fileID);
 end
+
+%% Export Interpolation Estimation with uncertainty (Zenodo)
+load('../4-Estimation/data/Density_estimationMap');
+load('../6-Flight/data/Density_estimationMap');
 
 id = ~isnan(gd.dens_est) & ~isnan(guv.u_est);
 t=table();
@@ -40,7 +47,7 @@ t.latitude = g.lat3D(id);
 t.longitude = g.lon3D(id);
 t.time = g.time3D(id);
 
-writetable(t,'./zenodo/interpolation_result1.csv')
+writetable(t,'./zenodo/interpolation_result.csv')
 
 
 %%

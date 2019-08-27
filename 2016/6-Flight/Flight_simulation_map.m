@@ -2,13 +2,15 @@
 % Script to generate simulated map of bird migration
 
 %% Clear and load data
-clear all; load coastlines; addpath('../functions/');
-load('data/dc_corr');
-load('data/Flight_modelInf')
-load('data/Flight_estimationMap');
-load('data/Density_estimationMap.mat','g')
+clear all; 
+load('../1-Cleaning/data/dc_corr.mat'); 
+load('./data/Flight_inference.mat'); 
+load('./data/Flight_estimationMap','g');
+load coastlines;
+addpath('./functions/'); 
 
-
+dclat = [dc.lat]';
+dclon = [dc.lon]';
 
 
 %% Compute neighborhood, weight and variance 
@@ -60,9 +62,17 @@ Ddist_gg = squareform(pdist([g.lat2D(g.latlonmask) g.lon2D(g.latlonmask)], @lldi
 Ddist_gr = pdist2([[dc.lat]' [dc.lon]'], [g.lat2D(g.latlonmask) g.lon2D(g.latlonmask)], @lldistkm);
 
 
+% Covariance Matrix of hard data
+Dtime = squareform(pdist(data.time));
+Ddist_sm = squareform(pdist([dclat dclon], @lldistkm));
+Ddist = Ddist_sm(data.radar,data.radar);
+
+tic;Crrnu = uv.cov.Cu(Ddist,Dtime);toc
+tic;Crrnv = uv.cov.Cv(Ddist,Dtime);toc
+
+
+%%
 % 2.2 Residu: Computaiton of the weight neigh and S
-uv_cov_parm_u=uv.cov.parm_u;
-uv_cov_parm_v=uv.cov.parm_v;
 NEIGHG=cell(g.nat,1);
 NEIGHR=cell(g.nat,1);
 LAMBDA_u=cell(g.nat,1);
@@ -76,20 +86,15 @@ dist_thr_r = 2000;
 time_thr_r = 2;
 neighg_nb=100;
 neighr_nb=50;
-Gneiting = @(dist,time,range_dist,range_time,delta,gamma,beta) 1./( (time./range_time).^(2.*delta) +1 ) .* exp(-(...
-    dist./range_dist).^(2.*gamma)./((time./range_time).^(2.*delta) +1).^(beta.*gamma) );
-
-Cf_u = @(dist,time) uv_cov_parm_u(2).*Gneiting( dist, time, uv_cov_parm_u(3), uv_cov_parm_u(4), uv_cov_parm_u(5), uv_cov_parm_u(6), uv_cov_parm_u(7) );
-Cf_v = @(dist,time) uv_cov_parm_v(2).*Gneiting( dist, time, uv_cov_parm_v(3), uv_cov_parm_v(4), uv_cov_parm_v(5), uv_cov_parm_v(6), uv_cov_parm_v(7) );
 
 
 for i_d=1:g.nat
     % Sub-selection of the day radar and grid
-    neighday{i_d}  = find(ismember( data.dateradar, (i_d-1)*ndc+(1:ndc)));
-    uv_cov_C_u_i_d = uv.cov.C_u(neighday{i_d},neighday{i_d});
-    uv_cov_C_v_i_d = uv.cov.C_v(neighday{i_d},neighday{i_d});
-    uv_utrans{i_d} =  uv.utrans(neighday{i_d});
-    uv_vtrans{i_d} =  uv.vtrans(neighday{i_d});
+    neighday{i_d}  = find(data.day==i_d);
+    uv_cov_C_u_i_d = Crrnu(neighday{i_d},neighday{i_d});
+    uv_cov_C_v_i_d = Crrnv(neighday{i_d},neighday{i_d});
+    uv_ut{i_d} =  uv.ut(neighday{i_d});
+    uv_vt{i_d} =  uv.vt(neighday{i_d});
     sim{i_d} = find(g.dateradar==i_d);
     
     % Distance matrix for the day
@@ -120,26 +125,26 @@ for i_d=1:g.nat
         % (path value less than currently simulated)
         neighg = find(Pathll_i_d<i_pt & bsxfun(@and, Ddist_gg(:,LL_i(i_pt))<dist_thr_g , Dtime_gg(:,TT_i(i_pt))'<time_thr_g ));
         
-        Cgp_u = Cf_u( Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(i_pt)), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(i_pt)) );
+        Cgp_u = uv.cov.Cu( Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(i_pt)), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(i_pt)) );
         [Cgp_u,tmp_u]=maxk(Cgp_u,neighg_nb);
         neighg=neighg(tmp_u);
+        Cgp_v = uv.cov.Cv(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(i_pt)), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(i_pt)));
         
-        Cgg_u = uv_cov_parm_u(1)*eye(numel(neighg)) + Cf_u(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(Pathll_i_d(neighg))), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(Pathll_i_d(neighg))));
-        Cgp_v = Cf_v(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(i_pt)), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(i_pt)));
-        Cgg_v = uv_cov_parm_v(1)*eye(numel(neighg)) + Cf_v(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(Pathll_i_d(neighg))), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(Pathll_i_d(neighg))));
-        
+        Cgg_u = uv.cov.Cu(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(Pathll_i_d(neighg))), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(Pathll_i_d(neighg))));
+        Cgg_v = uv.cov.Cv(Ddist_gg(LL_i(Pathll_i_d(neighg)),LL_i(Pathll_i_d(neighg))), Dtime_gg(TT_i(Pathll_i_d(neighg)),TT_i(Pathll_i_d(neighg))));
+
         
         % 2. Find the radar neigh
-        neighr=find( Ddist_gr(data.i_r(neighday_i_d),LL_i(i_pt))<dist_thr_r & Dtime_gr(:,TT_i(i_pt))<time_thr_r);
-        Crp_u = Cf_u(Ddist_gr(data.i_r(neighday_i_d(neighr)),LL_i(i_pt)), Dtime_gr(neighr,TT_i(i_pt)));
+        neighr=find( Ddist_gr(data.radar(neighday_i_d),LL_i(i_pt))<dist_thr_r & Dtime_gr(:,TT_i(i_pt))<time_thr_r);
+        Crp_u = uv.cov.Cu(Ddist_gr(data.radar(neighday_i_d(neighr)),LL_i(i_pt)), Dtime_gr(neighr,TT_i(i_pt)));
         [Crp_u,tmp_u]=maxk(Crp_u,neighr_nb);
         neighr=neighr(tmp_u);
-        Crp_v = Cf_v(Ddist_gr(data.i_r(neighday_i_d(neighr)),LL_i(i_pt)), Dtime_gr(neighr,TT_i(i_pt)));
+        Crp_v = uv.cov.Cv(Ddist_gr(data.radar(neighday_i_d(neighr)),LL_i(i_pt)), Dtime_gr(neighr,TT_i(i_pt)));
         
         Crr_u = uv_cov_C_u_i_d(neighr,neighr);
         Crr_v = uv_cov_C_v_i_d(neighr,neighr);
-        Crg_u = Cf_u(Ddist_gr(data.i_r(neighday_i_d(neighr)),LL_i(Pathll_i_d(neighg))), Dtime_gr(neighr,TT_i(Pathll_i_d(neighg))));
-        Crg_v = Cf_v(Ddist_gr(data.i_r(neighday_i_d(neighr)),LL_i(Pathll_i_d(neighg))), Dtime_gr(neighr,TT_i(Pathll_i_d(neighg))));
+        Crg_u = uv.cov.Cu(Ddist_gr(data.radar(neighday_i_d(neighr)),LL_i(Pathll_i_d(neighg))), Dtime_gr(neighr,TT_i(Pathll_i_d(neighg))));
+        Crg_v = uv.cov.Cv(Ddist_gr(data.radar(neighday_i_d(neighr)),LL_i(Pathll_i_d(neighg))), Dtime_gr(neighr,TT_i(Pathll_i_d(neighg))));
         
         l_u =  [Cgg_u Crg_u'; Crg_u Crr_u] \  [Cgp_u; Crp_u];
         l_v =  [Cgg_v Crg_v'; Crg_v Crr_v] \  [Cgp_v; Crp_v];
@@ -149,8 +154,8 @@ for i_d=1:g.nat
         
         LAMBDA_u_tmp(:,i_pt) = [l_u ; nan(neighr_nb+neighg_nb-numel(l_u),1)]';
         LAMBDA_v_tmp(:,i_pt) = [l_v ; nan(neighr_nb+neighg_nb-numel(l_v),1)]';
-        S_u_tmp(i_pt) = sqrt(uv_cov_parm_u(1) + uv_cov_parm_u(2) - l_u'*[Cgp_u; Crp_u]);
-        S_v_tmp(i_pt) = sqrt(uv_cov_parm_v(1) + uv_cov_parm_v(2) - l_v'*[Cgp_v; Crp_v]);
+        S_u_tmp(i_pt) = sqrt(sum( uv.cov.parm_u(1:2)) - l_u'*[Cgp_u; Crp_u]);
+        S_v_tmp(i_pt) = sqrt(sum( uv.cov.parm_v(1:2)) - l_v'*[Cgp_v; Crp_v]);
         assert(isreal(S_v_tmp(i_pt)))
     end
     
@@ -172,15 +177,6 @@ for i_d=1:g.nat
 end
 
 
-for i_d=1:g.nat
-    NEIGHG{i_d} = single(NEIGHG{i_d} );
-    NEIGHR{i_d} = single(NEIGHR{i_d});
-    LAMBDA_u{i_d} = single(LAMBDA_u{i_d});
-    LAMBDA_v{i_d} = single(LAMBDA_v{i_d});
-    S_u{i_d} = single(S_u{i_d});
-    S_v{i_d} = single(S_v{i_d});
-end
-
 
 % save('data/Flight_simulationMap','NEIGHG','NEIGHR','LAMBDA_u','LAMBDA_v','pathll','S_u','S_v','neighday','sim','-v7.3')
 % load('data/Flight_simulationMap')
@@ -195,7 +191,7 @@ real_un_ll = nan(g.nlm,g.nt,nb_real);
 real_vn_ll = nan(g.nlm,g.nt,nb_real);
 
 
-for i_real=1:nb_real
+for radareal=1:nb_real
     rng('shuffle');
     Uu=randn(g.nlm,g.nt);
     Uv=randn(g.nlm,g.nt);
@@ -209,14 +205,14 @@ for i_real=1:nb_real
             ng = ~isnan(NEIGHG{i_d}(:,i_pt));
             nr = ~isnan(NEIGHR{i_d}(:,i_pt));
             nl = ~isnan(LAMBDA_u{i_d}(:,i_pt));
-            tmp_u(pathll{i_d}(i_pt)) = LAMBDA_u{i_d}(nl,i_pt)'*[tmp_u(NEIGHG{i_d}(ng,i_pt)) ; uv.utrans(neighday{i_d}(NEIGHR{i_d}(nr,i_pt)))] + Uu(i_pt)*S_u{i_d}(i_pt);
-            tmp_v(pathll{i_d}(i_pt)) = LAMBDA_v{i_d}(nl,i_pt)'*[tmp_v(NEIGHG{i_d}(ng,i_pt)) ; uv.vtrans(neighday{i_d}(NEIGHR{i_d}(nr,i_pt)))] + Uu(i_pt)*S_v{i_d}(i_pt);
+            tmp_u(pathll{i_d}(i_pt)) = LAMBDA_u{i_d}(nl,i_pt)'*[tmp_u(NEIGHG{i_d}(ng,i_pt)) ; uv.ut(neighday{i_d}(NEIGHR{i_d}(nr,i_pt)))] + Uu(i_pt)*S_u{i_d}(i_pt);
+            tmp_v(pathll{i_d}(i_pt)) = LAMBDA_v{i_d}(nl,i_pt)'*[tmp_v(NEIGHG{i_d}(ng,i_pt)) ; uv.vt(neighday{i_d}(NEIGHR{i_d}(nr,i_pt)))] + Uu(i_pt)*S_v{i_d}(i_pt);
             %assert(~isnan(Resd(pathll{i_d}(i_pt))))
             %assert(isreal(Resd(pathll{i_d}(i_pt))))
         end
         
-        real_un_ll(:,sim{i_d},i_real) = tmp_u;
-        real_vn_ll(:,sim{i_d},i_real) = tmp_v;
+        real_un_ll(:,sim{i_d},radareal) = tmp_u;
+        real_vn_ll(:,sim{i_d},radareal) = tmp_v;
         
     end
 end
@@ -228,12 +224,12 @@ real_v_ll = single(real_vn_ll *uv.trans.std(2) + uv.trans.mean(2));
 save('data/Flight_simulationMap_real_ll','real_u_ll','real_v_ll','-v7.3');
 
 %% Figure
-i_real=1;
+radareal=1;
 
 u = nan(g.nlat,g.nlon,g.nt);
 v = nan(g.nlat,g.nlon,g.nt);
-u(repmat(g.latlonmask,1,1,g.nt)) = real_u_ll(:,:,i_real);
-v(repmat(g.latlonmask,1,1,g.nt)) = real_v_ll(:,:,i_real);
+u(repmat(g.latlonmask,1,1,g.nt)) = real_u_ll(:,:,radareal);
+v(repmat(g.latlonmask,1,1,g.nt)) = real_v_ll(:,:,radareal);
 
 u(isnan(u))=0;
 v(isnan(v))=0;

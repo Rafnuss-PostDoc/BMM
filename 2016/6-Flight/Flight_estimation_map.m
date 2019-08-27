@@ -71,11 +71,11 @@ end
 %% Back-transform
 %
 
-guv.u_est = guv_ut_est *uv.t.std(1) + uv.t.mean(1);
-guv.v_est = guv_vt_est *uv.t.std(2) + uv.t.mean(2);
+guv.u_est = guv_ut_est *uv.trans.std(1) + uv.trans.mean(1);
+guv.v_est = guv_vt_est *uv.trans.std(2) + uv.trans.mean(2);
 
-guv.u_sig = sqrt(guv_ut_sig.^2 * uv.t.std(1)^2 );
-guv.v_sig = sqrt(guv_vt_sig.^2 * uv.t.std(2)^2 );
+guv.u_sig = sqrt(guv_ut_sig.^2 * uv.trans.std(1)^2 );
+guv.v_sig = sqrt(guv_vt_sig.^2 * uv.trans.std(2)^2 );
 
 
 %% Figure
@@ -98,7 +98,7 @@ Frame(numel(mask_fullday)-1) = struct('cdata',[],'colormap',[]);
 geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
 geoshow('worldrivers.shp','Color', 'blue')
 set(gcf,'color','w');
-for i_t = 1:numel(mask_fullday)
+for i_t = 2:numel(mask_fullday)
 
     u_res = imresize(u(:,:,mask_fullday(i_t)),rzd);
     u_isnan_res = imresize(u_isnan(:,:,mask_fullday(i_t)),rzd);
@@ -114,13 +114,13 @@ for i_t = 1:numel(mask_fullday)
     
     drawnow
     title(datestr(g.time(mask_fullday(i_t)))); drawnow;
-    Frame(i_t) = getframe(h);
-    [imind,cm] = rgb2ind(frame2im(Frame(i_t)),256); 
-    if i_t == 1
-        imwrite(imind,cm,[filename '.gif'],'gif', 'Loopcount',inf,'DelayTime',0.1);
-    else
-        imwrite(imind,cm,[filename '.gif'],'gif','WriteMode','append','DelayTime',0.1);
-    end
+%     Frame(i_t) = getframe(h);
+%     [imind,cm] = rgb2ind(frame2im(Frame(i_t)),256); 
+%     if i_t == 1
+%         imwrite(imind,cm,[filename '.gif'],'gif', 'Loopcount',inf,'DelayTime',0.1);
+%     else
+%         imwrite(imind,cm,[filename '.gif'],'gif','WriteMode','append','DelayTime',0.1);
+%     end
     delete(hsurf);
 end
 

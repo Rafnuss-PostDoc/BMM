@@ -8,6 +8,7 @@ load('../1-Cleaning/data/sunrisesunset_grid.mat')
 load('../1-Cleaning/data/Rain_grid.mat','TCRW');
 load('../2-Inference/data/Density_inference.mat'); 
 addpath('./functions/'); 
+load coastlines.mat
 
 %% 2. Initialization of the grid
 %
@@ -116,7 +117,7 @@ g.mask_day =  g.NNT>-1 & g.NNT<1;
 % Mask Rain
 rain = [];
 for i_d=1:ndc
-    id=dc(i_d).scoret<1&dc(i_d).scoret>-1;
+    id=dc(i_d).NNT<1&dc(i_d).NNT>-1;
     rain=[rain; repmat(i_d,sum(id),1) dc(i_d).denss(id), dc(i_d).tcrw(id) nansum(dc(i_d).DBZH(id,:),2)];
 end
 
@@ -231,7 +232,7 @@ end
 
 %% 6.3 Residu Kriging
 % Covariance matrix of weather radar data 
-Dtime = sq80uareform(pdist(data.time));
+Dtime = squareform(pdist(data.time));
 Ddist_sm = squareform(pdist([dclat dclon], @lldistkm));
 Ddist = Ddist_sm(data.radar,data.radar);
 tic;Caa = res.cov.C(Ddist,Dtime);toc
