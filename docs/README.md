@@ -1,4 +1,4 @@
-# Bird Migration Map (BMM)
+# Bird Migration Map (BMM2)
 
 ## In short
 BMM use classical geostatistical methods (i.e. kriging) to quantify nocturnal bird migration across Europe based on weather radar observations.
