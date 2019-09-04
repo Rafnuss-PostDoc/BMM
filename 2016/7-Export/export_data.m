@@ -1,9 +1,4 @@
-load('data/Density_estimationMap');
-load('data/Flight_estimatiotnMap');
 
-load('./data/Flight_inference.mat'); 
-
-load('data/Density_modelInf.mat','pow_a')
 addpath('./functions/')
 
 %% Export raw data (Zenodo)
