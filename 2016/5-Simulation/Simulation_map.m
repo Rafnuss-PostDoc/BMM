@@ -421,7 +421,7 @@ if any(real_denst(:)<0)
     real_denst(real_denst<0)=nan;
 end
 
-real_dens = (real_denst).^(1/pow_a);
+real_dens = (real_denst).^(1/pow);
 
 
 
@@ -487,7 +487,7 @@ load('data/Density_estimationMap')
 
 % err sim
 % ok if transformed, slight asymetry if not. 
-err = reshape(gd.dens_est(repmat(g.latlonmask,1,1,g.nt)),sum(g.latlonmask(:)),g.nt).^pow_a - mean(real_dens_ll.^pow_a,3);
+err = reshape(gd.dens_est(repmat(g.latlonmask,1,1,g.nt)),sum(g.latlonmask(:)),g.nt).^pow - mean(real_dens_ll.^pow,3);
 histogram(err(:))
 err = reshape(gd.dens_est(repmat(g.latlonmask,1,1,g.nt)),sum(g.latlonmask(:)),g.nt) - mean(real_dens_ll,3);
 histogram(err(:))
