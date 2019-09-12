@@ -1,8 +1,8 @@
 %% Sink/source version 
 
 % Estimation 
-load('data/Density_estimationMap','gd','g')
-load('data/Flight_estimationMap','guv')
+load('../4-Estimation/data/Density_estimationMap','gd','g')
+load('../6-Flight/data/Flight_estimationMap','guv')
 addpath('./functions/')
 load coastlines;
 
