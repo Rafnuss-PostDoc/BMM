@@ -21,4 +21,5 @@ bioRxiv 690065; <i class="ai ai-doi"> [10.1101/690065](https://doi.org/10.1101/6
 [<i class="ai ai-researchgate ai-4x">](https://www.researchgate.net/project/Bird-Migration-Modelling-BMM)
 
 
-<link rel="stylesheet" href="/path/to/folder/css/academicons.min.css"/>
+<link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
