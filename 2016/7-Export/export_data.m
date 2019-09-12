@@ -25,7 +25,7 @@ end
 
 %% Export Interpolation Estimation with uncertainty (Zenodo)
 load('../4-Estimation/data/Density_estimationMap');
-load('../6-Flight/data/Density_estimationMap');
+load('../6-Flight/data/Flight_estimationMap');
 
 id = ~isnan(gd.dens_est) & ~isnan(guv.u_est);
 t=table();
@@ -33,11 +33,9 @@ t.density_estimation = round(gd.dens_est(id),2);
 t.density_quantile10 = round(gd.dens_q10(id),2);
 t.density_quantile90 = round(gd.dens_q90(id),2);
 t.speedu_estimation = round(guv.u_est(id),2);
-t.speedu_quantile10 = round(guv.u_q10(id),2);
-t.speedu_quantile90 = round(guv.u_q90(id),2);
+t.speedu_std = round(guv.u_sig(id),2);
 t.speedv_estimation = round(guv.v_est(id),2);
-t.speedv_quantile10 = round(guv.v_q10(id),2);
-t.speedv_quantile90 = round(guv.v_q90(id),2);
+t.speedv_std = round(guv.v_sig(id),2);
 t.latitude = g.lat3D(id);
 t.longitude = g.lon3D(id);
 t.time = g.time3D(id);
@@ -45,7 +43,10 @@ t.time = g.time3D(id);
 writetable(t,'./zenodo/interpolation_result.csv')
 
 
-%%
+%% Export for MangoDB
+load('../4-Estimation/data/Density_estimationMap');
+load('../6-Flight/data/Flight_estimationMap');
+
 dlat = lldistkm([g.lat(1) g.lon(1)],[g.lat(2) g.lon(1)]);
 dlon = lldistkm([g.lat2D(:,1) g.lon2D(:,1)],[g.lat2D(:,1) g.lon2D(:,2)]);
 area = repmat(dlon*dlat,1,g.nlon);
@@ -99,11 +100,11 @@ latlon=latlon(:,1:i-1);
 % fprintf(fileID,jsonencode({latlon',round(permute(density,[3,2,1]),2),round(all_Density',2)}));
 % fclose(fileID);
 
-fileID = fopen('BMM_web/exportEst_time.json','w');
+fileID = fopen('BMM_web/API/exportEst_time.json','w');
 fprintf(fileID,jsonencode({datestr(g.time(idt),'yyyy-mm-dd HH:MM')}));
 fclose(fileID);
 
-fileID = fopen('BMM_web/exportEst_grid.json','w');
+fileID = fopen('BMM_web/API/exportEst_grid.json','w');
 fprintf(fileID,jsonencode(latlon'));
 fclose(fileID);
 
@@ -130,13 +131,13 @@ end
 str = jsonencode(d);
 str=strrep(str(2:end-1),'},{','}\n{');
 str=strrep(str,'id','_id');
-fileID = fopen('BMM_web/exportEst_mongodb.json','w');
+fileID = fopen('BMM_web/API/exportEst_mongodb.json','w');
 fprintf(fileID,str);
 fclose(fileID);
 
 
 %% Simulation
-load('data/Density_simulationMap_reassemble_ll');
+load('../5-Simulation/data/Density_simulationMap_reassemble_ll');
 
 % Compute area
 dlat = lldistkm([g.lat(1) g.lon(1)],[g.lat(2) g.lon(1)]);
@@ -155,15 +156,15 @@ idt3 = idt2(1:2:end);
 idtb = find([diff(idt) ;1] ~= 0 | [1; diff(idt)] ~= 0); % read buffer
 idt = unique([idt3;idtb]);
 
-
-% Compute number of bird accounting for area and rain
-real_nb_ll = real_dens_ll .* repmat(reshape(area(repmat(g.latlonmask,1,1,g.nt)),g.nlm,[]),1,1,size(real_dens_ll,3));
-real_nb_ll = real_nb_ll(:,idt,:);
-clear real_dens_ll
-
 % subsample real
 %[~,real_sort]=sort(reshape(nansum(nansum(real_nb_ll),2),1,[]));
-real_nb_ll = real_nb_ll(:,:,1:50);
+real_dens_ll_s = real_dens_ll(:,idt,1:50);
+clear real_dens_ll
+
+% Compute number of bird accounting for area and rain
+real_nb_ll = real_dens_ll_s .* repmat(reshape(area(repmat(g.latlonmask,1,1,numel(idt))),g.nlm,[]),1,1,size(real_dens_ll_s,3));
+clear real_dens_ll_s
+
 
 % Determine latlon coordinate for masked
 mask_latlon = [reshape(g.lat2D(g.latlonmask),[],1) reshape(g.lon2D(g.latlonmask),[],1)];
@@ -192,11 +193,11 @@ sim(isnan(sim))=0;
 latlon=latlon(:,1:i-1);
 
 % Writing files
-fileID = fopen('BMM_web/exportSim_grid.json','w');
+fileID = fopen('BMM_web/API/exportSim_grid.json','w');
 fprintf(fileID,jsonencode(latlon'));
 fclose(fileID);
 
-fileID = fopen('BMM_web/exportSim_time.json','w');
+fileID = fopen('BMM_web/API/exportSim_time.json','w');
 fprintf(fileID,jsonencode({datestr(g.time(idt),'yyyy-mm-dd HH:MM')}));
 fclose(fileID);
 
@@ -207,20 +208,76 @@ d = struct('sim', num2cell(sim(:)), 'loc_id', num2cell(K(:)), 'real_id', num2cel
 
 str = jsonencode(d);
 str=strrep(str(2:end-1),'},{','}\n{');
-fileID = fopen('BMM_web/exportSim_mongodb.json','w');
+fileID = fopen('BMM_web/API/exportSim_mongodb.json','w');
 fprintf(fileID,str);
 fclose(fileID);
 
 
 %% Binary
 
-fileID = fopen('BMM_web/exportDensityGrid.bin','w');
-fwrite(fileID,cat(3,density,all_Density),'single');
-fclose(fileID);
+% fileID = fopen('BMM_web/exportDensityGrid.bin','w');
+% fwrite(fileID,cat(3,density,all_Density),'single');
+% fclose(fileID);
+% 
+% fileID = fopen('BMM_web/exportDensityGrid_latlon_time.json','w');
+% fprintf(fileID,jsonencode({latlon, datestr(g.time(idt),'yyyy-mm-dd HH:MM')}));
+% fclose(fileID);
 
-fileID = fopen('BMM_web/exportDensityGrid_latlon_time.json','w');
-fprintf(fileID,jsonencode({latlon, datestr(g.time(idt),'yyyy-mm-dd HH:MM')}));
-fclose(fileID);
+%% Export ImageOverlay
+
+% Estimation 
+folder ='Density_estimationMap_ImageOverlay/';
+data = log10(gd.dens_est);
+min_d=0;
+max_d=2;
+cm=viridis(255); % https://ch.mathworks.com/matlabcentral/fileexchange/51986-perceptually-uniform-colormaps
+mat2img(data,min_d,max_d,cm,g,folder,0)
+
+% Simulation
+folder ='Density_simulationMap_ImageOverlay/';
+i_real=1;
+tmp = nan(g.nlat,g.nlon,g.nt);
+tmp(repmat(g.latlonmask,1,1,g.nt)) = real_dens_ll(:,:,i_real);
+data = log10(tmp);
+min_d=0;
+max_d=2;
+mat2img(data,min_d,max_d,cm,g,folder,0)
+
+% Sink/source
+% folder = 'SinkSource_estimationMap_ImageOverlay/';
+% load('../8-SinkSource/data/SinkSourceSim.mat','W')
+% data=W;
+% min_d=-15; max_d=15;
+% cm=colormap(brewermap([],'Spectral'));
+% cm = interp1(linspace(1,255,64),cm,1:255);
+% mat2img(data,min_d,max_d,g,folder)
+
+% Rain
+load('../1-Cleaning/data/Rain_grid.mat'); % load total column rain water (kg/m^2)
+mean(TCRW(:)>g.mask_rain_thr);
+folder ='rain2/';
+data = TCRW;
+% 
+mat2img(data,min_d,max_d,cm,g,folder,1)
+
+
+%% Export Quiver
+
+load('../6-Flight/data/Flight_estimationMap')
+folder='Quiver_est2/';
+u=guv.u_est;
+v=guv.v_est;
+rzd =1/4;
+quiver2img(u,v,rzd,g,folder)
+
+load('../6-Flight/data/Flight_simulationMap_real_ll')
+folder='Quiver_sim2/';
+u = nan(g.nlat,g.nlon,g.nt);
+v = nan(g.nlat,g.nlon,g.nt);
+u(repmat(g.latlonmask,1,1,g.nt)) = real_u_ll(:,:,1);
+v(repmat(g.latlonmask,1,1,g.nt)) = real_v_ll(:,:,1);
+rzd =1/4;
+quiver2img(u,v,rzd,g,folder)
 
 %% OLD NOT USED
 % % Export old csv

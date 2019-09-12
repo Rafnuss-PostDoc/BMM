@@ -1,31 +1,18 @@
 
-load('data/Flight_estimationMap')
-folder='Quiver_est/';
-u=guv.u_est;
-v=guv.v_est;
-u_isnan=single(~isnan(guv.u_est));
-v_isnan=single(~isnan(guv.v_est));
-
-load('data/Flight_simulationMap_real_ll')
-folder='Quiver_sim/';
-u = nan(g.nlat,g.nlon,g.nt);
-v = nan(g.nlat,g.nlon,g.nt);
-u(repmat(g.latlonmask,1,1,g.nt)) = real_u_ll(:,:,1);
-v(repmat(g.latlonmask,1,1,g.nt)) = real_v_ll(:,:,1);
+function quiver2img(u,v,rzd,g,folder)
 
 
 u_isnan=single(~isnan(u));
 v_isnan=single(~isnan(v));
+
 u(isnan(u))=0;
 v(isnan(v))=0;
 
-rzd=1/4;
 lat2D_res=imresize(g.lat2D,rzd);
 lon2D_res=imresize(g.lon2D,rzd);
 
-
 figure('position',[0 0 900 1000])
-for i=1:size(u,3)
+for i=1627:size(u,3)
     if sum(sum(u(:,:,i)))==0
         copyfile('./BMM_web/blank.png',['./BMM_web/' folder datestr(g.time(i),'yyyy-mm-dd-HH-MM') '_3857.png'])
     else
@@ -63,3 +50,5 @@ status = system('del *.png'); assert(status==0)
 cd(['./tmp/']); status = system('move *.png ..'); assert(status==0); cd ..
 status = system('rmdir tmp'); assert(status==0)
 cd ../..
+
+end
