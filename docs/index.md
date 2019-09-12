@@ -1,6 +1,6 @@
 # Bird Migration Map
 
-European weather radar to model bird migration. [<i class="ai ai-researchgate ai-4x">](https://www.researchgate.net/project/Bird-Migration-Modelling-BMM) 
+Modeling bird migration using the European weather radar network. All publications available on <i class="ai ai-researchgate">[project/Bird-Migration-Modelling-BMM](https://www.researchgate.net/project/Bird-Migration-Modelling-BMM) 
 
 ## Project 1: A geostatistical approach to estimate high resolution nocturnal bird migration densities from a weather radar network.
 The first project focus on developing a geostatisctial model to interpolate bird density at high resolution.
@@ -21,4 +21,4 @@ bioRxiv 690065; <i class="ai ai-doi"> [10.1101/690065](https://doi.org/10.1101/6
 
 
 <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css">
-<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
