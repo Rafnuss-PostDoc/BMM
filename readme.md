@@ -3,7 +3,7 @@
 Modeling bird migration using the European weather radar network. All publications available on [ResearchGate](https://www.researchgate.net/project/Bird-Migration-Modelling-BMM).
 
 ## Project 1: A geostatistical approach to estimate high resolution nocturnal bird migration densities from a weather radar network.
-The first project focused on developing a geostatisctial model to interpolate bird densities at high resolution.
+The first project focuses on developing a geostatisctial model to interpolate bird densities at high resolution.
 
 **Website:**
 [rafnuss-postdoc.github.io/BMM/2016](https://rafnuss-postdoc.github.io/BMM/2016)
