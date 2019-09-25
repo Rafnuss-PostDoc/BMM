@@ -15,7 +15,7 @@ The first project focuses on developing a geostatisctial model to interpolate bi
 > A geostatistical approach to estimate high resolution nocturnal bird migration densities from a weather radar network. Raphaël Nussbaumer, Lionel Benoit, Grégoire Mariethoz, Felix Liechti, Silke Bauer, Baptiste Schmid. bioRxiv 690065. DOI:[10.1101/690065](https://doi.org/10.1101/690065).
 
 **Paper:**
-> Nussbaumer, R.; Benoit, L.; Mariethoz, G.; Liechti, F.; Bauer, S.; Schmid, B. A Geostatistical Approach to Estimate High Resolution Nocturnal Bird Migration Densities from a Weather Radar Network. Remote Sens. **2019**, 11, 2233. DOI:[10.3390/rs11192233](https://doi.org/10.3390/rs11192233).
+> A Geostatistical Approach to Estimate High Resolution Nocturnal Bird Migration Densities from a Weather Radar Network. Nussbaumer, R.; Benoit, L.; Mariethoz, G.; Liechti, F.; Bauer, S.; Schmid, B. *Remote Sens*. **2019**, 11, 2233. DOI:[10.3390/rs11192233](https://doi.org/10.3390/rs11192233).
   
 **Demo:**
 [bmm.raphaelnussbaumer.com](https://bmm.raphaelnussbaumer.com/)
