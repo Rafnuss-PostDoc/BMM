@@ -7,7 +7,7 @@ quantity = {'dens','ff','dd','DBZH','eta','sd_vvp'};
 
 d = download_vp(start_date,end_date, quantity);
 
-save('data/d2018all.mat','d','start_date','end_date','quantity','-v7.3');
+save('data/d2019all.mat','d','start_date','end_date','quantity','-v7.3');
 
 % Figure
 for i_d=1:numel(d)
@@ -27,6 +27,25 @@ for i_d=1:numel(d)
     print(['figure/' num2str(i_d) ,'_', d(i_d).name '.png'],'-dpng', '-r300')
 end
 
+%% Check 2019
+start_date='01-Jan-2019 00:00:00';
+end_date='01-Jan-2020 00:00:00';
+quantity = {'dens','ff','dd','DBZH','eta','sd_vvp'};
+
+d = download_vp(start_date,end_date, quantity);
+
+save('data/d2019all.mat','d','start_date','end_date','quantity','-v7.3');
+
+
+
+tmp_t = (datenum(start_date)-.5):(datenum(end_date)+.5);
+tmp = nan(numel(tmp_t)-1, numel(d));
+for i_d=1:numel(d)
+    tmp(:,i_d) = histcounts (round(datenum(d(i_d).time(~all(isnan(d(i_d).dens),2)))),tmp_t);
+end
+figure;
+imagesc(tmp')
+datetick('x'); yticks(1:numel(d)); yticklabels({d.name});
 
 %% 2. Delete entire radar 
 load('data/d2018all.mat'); addpath('functions/')
@@ -34,10 +53,10 @@ load('data/d2018all.mat'); addpath('functions/')
 % Observed data
 % CleaningV(d)
 
-% Remove radars with wrong, imcomplete data: 76 radars overs 123
+% Load information about cleaning
 C=readtable('data/Cleaning.xlsx');
 
-
+% Remove radars with wrong, imcomplete data: 76 radars overs 123
 for i_d=numel(d):-1:1
     id = strcmp(C.Name,d(i_d).name);
     if ~C.Keep(id)
@@ -68,7 +87,10 @@ end
 
 
 %% Set the regular grid
-dt=1/24/4/3;
+% Median resolution is 5 minutes
+cellfun(@(x) median(diff(x)), {d.time},'UniformOutput',false)
+
+dt=1/24/4/3; % All radar have a 5 minutes delta t. 
 tnum = datenum(start_date):dt:datenum(end_date);
 tdate = datetime(tnum,'convertfrom','datenum');
 f_tid = @(x) round((datenum(x)-tnum(1))/dt+1);
@@ -85,43 +107,33 @@ for i_d=1:numel(d)
 end
 
 %% 3. Load Sunrise
-% % Downalod sunrise/sunset time at radar location
-% time = start_date-1:end_date+1;
-% data={};
-% for i_d=1:numel(d)
-%     data(i_d).lat = d(i_d).lat;
-%     data(i_d).lon = d(i_d).lon;
-%     data(i_d).name = d(i_d).name;
-%     for i_t=1:numel(time)
-%         dd = webread(['https://api.sunrise-sunset.org/json?lat=' num2str(d(i_d).lat) '&lng=' num2str(d(i_d).lon) '&date=' datestr(time(i_t),'yyyy-mm-dd')]);
-%         assert(strcmp(dd.status,'OK'))
-%         data(i_d).sunrs{i_t} = dd.results;
-%         % pause(5)
-%     end
-% end
-% save('data/sunrisesunset.mat','time','data')
-
-% Match sunset/sunrise time of radars with d struct
-load('data/sunrisesunset.mat')
-time2=datestr(time,'yyyy-mmm-dd');
-sunr = strings(numel(d), numel(time));
-suns = strings(numel(d), numel(time));
-for i_d=1:numel(d)
-    id = find(strcmp({data.name},d(i_d).name));
-    assert(id~=0,'no data for this radar')
-
-    for i_t=1:numel(time)
-        sunr(i_d,i_t) = [time2(i_t,:) ' ' data(i_d).sunrs{i_t}.sunrise];%civil_twilight_begin];
-        suns(i_d,i_t) = [time2(i_t,:) ' ' data(i_d).sunrs{i_t}.sunset];%civil_twilight_end];
+val = jsondecode(fileread('sunriseset_astral\sunriseset_latlon.json'));
+time = datetime(start_date):datetime(end_date);
+sunrs=strings(numel(val),numel(val{1}),numel(val{1}{1}));
+for i=1:numel(val)
+    for j=1:numel(val{i})
+        try
+            sunrs(i,j,:)=val{i}{j};
+        end
     end
 end
-sunr = datetime(sunr);
-suns = datetime(suns);
+sunrs = datetime(sunrs);
+
 for i_d=1:numel(d)
-    i=find(strcmp(d(i_d).name,{data.name}));
-    [~,Locb] = ismember(dateshift(d(i_d).time,'start', 'day','nearest'),time-0.5);
-    d(i_d).sunset = suns(i_d,Locb-1)';
-    d(i_d).sunrise = sunr(i_d,Locb)';
+    [~,Locb] = ismember(dateshift(d(i_d).time,'start', 'day','nearest'),time);
+    d(i_d).dawn = sunrs(i_d,Locb,1);
+    d(i_d).sunrise = sunrs(i_d,Locb,2);
+    d(i_d).sunset = sunrs(i_d,Locb-1,3);
+    d(i_d).dusk = sunrs(i_d,Locb-1,4);
+end
+
+for i_d=1:numel(dc)
+    i_d2 = find(strcmp(dc(i_d).name, {d.name}));
+    [~,Locb] = ismember(dateshift(dc(i_d).time,'start', 'day','nearest'),time);
+    dc(i_d).dawn = sunrs(i_d2,Locb,1)';
+    dc(i_d).sunrise = sunrs(i_d2,Locb,2)';
+    dc(i_d).sunset = sunrs(i_d2,max(Locb-1,1),3)';
+    dc(i_d).dusk = sunrs(i_d2,max(Locb-1,1),4)';
 end
 
 % Check that it works fine
@@ -269,58 +281,73 @@ end
 % Cleaning manually
 dc = CleaningV(d);
 
+% deoft has a lot of noise in eta. Take dens and clean it. 
+i_d=strcmp({dc.name},'depro'); %deoft, dehnr, depro
+dc(i_d).dens2=dc(i_d).dens;
+dc(i_d).dens2(all(isnan(dc(i_d).dens3),2),:) = NaN;
+for i_t=1:numel(dc(i_d).time)
+    firt=find(dc(i_d).dens(i_t,:)>0,1,'last');
+    id=dc(i_d).dens2(i_t,1:firt)==0 | isnan(dc(i_d).dens2(i_t,1:firt));
+    dc(i_d).dens2(i_t,id)= dc(i_d).dens3(i_t,id);
+end
+
 %Save 
 for i_d=1:numel(dc)
     dens2{i_d} = dc(i_d).dens2;
 end
 % First version: limited edit
-% save('data/dc_dens2_v2','dens2');
-% Second version: ground clutter elimination, more extensif
+% save('data/dc_dens2_v1','dens2');
+% Second version: ground clutter elimination, more extensif, manual
+% clearning
 % save('data/dc_dens2_v2','dens2');
 
 
 %% Automatic post-cleaning
 load('data/dc_dens2_v2');
-for i_d=1:numel(d)
-    d(i_d).dens2 = dens2{i_d};
+for i_d=1:numel(dc)
+    dc(i_d).dens2 = dens2{i_d};
 end
-dc=d;
+%dc=d;
 
 C=readtable('data/Cleaning.xlsx');
-B = 1/8*ones(3,3);
-B(2,2)=0;
+
+% kernel for data alone, if less than 30min of data
+B1 = ones(60/5+1,1);
+B1(30/5+1)=0;
+
+% kernel for noise removal
+B2 = 1/8*ones(3,3);
+B2(2,2)=0;
+
+% interpolation grid
 [X,Y]=meshgrid(1:25,1:numel(dc(1).time));
 
 for i_d=1:length(dc)
-    
+    % altitude axis
     dc(i_d).alt=dc(i_d).interval*(1:dc(i_d).levels)-dc(i_d).interval/2;
     
-    % Expend to 5000m
+    % reshape to same size for all radars
     dc(i_d).dens3 = [ dc(i_d).dens2 nan(size(dc(i_d).dens2,1),25-size(dc(i_d).dens2,2))];
+    dc(i_d).ff = [ dc(i_d).ff nan(size(dc(i_d).ff,1),25-size(dc(i_d).ff,2))];
+    dc(i_d).dd = [ dc(i_d).dd nan(size(dc(i_d).dd,1),25-size(dc(i_d).dd,2))];
     
     % Remove data if less than 5 lowest layers present
     dc(i_d).dens3(any(isnan(dc(i_d).dens2(:, dc(i_d).scatter_lim:dc(i_d).scatter_lim+5)),2),:)=NaN;
-    
-    % Remove noise level element
-%     i_dd = strcmp(C.Name,dc(i_d).name);
-%     if ~strcmp(C.NoiseDate{i_dd},'NaN')
-%         tmp = datetime(C.NoiseDate{i_dd},'format','dd/MM/yyyy');
-%         noise_range = tmp-.5<dc(i_d).time & dc(i_d).time < tmp+.5;
-%         noise = dc(i_d).dens3(noise_range,:);
-%         dc(i_d).dens3 = dc(i_d).dens3-repmat(nanmean(noise),size(dc(i_d).dens3,1),1);
-%         dc(i_d).dens3(dc(i_d).dens3<0)=0;
-%     end
+  
+    % Remove for alone data 
+    id_nan=any(~isnan(dc(i_d).dens3),2);
+    tmp = conv2(id_nan,B1,'same');
+    dc(i_d).dens3(id_nan & tmp<(30/5-1),:)=nan;
 
-    
+    % Remove noise level element
     ldc = log10(dc(i_d).dens3+1);
     id_nan = isnan(ldc);
-    tmp2=conv2(~id_nan,B,'same');
+    tmp2=conv2(~id_nan,B2,'same');
     ldc(id_nan)=0;
-    idx = ldc > 2*conv2(ldc,B,'same')./tmp2;
+    idx = ldc > 2*conv2(ldc,B2,'same')./tmp2;
     
-
     % Interpolate up to 5000m. 
-    id=~all(isnan(dc(i_d).dens2),2);
+    id=~all(isnan(dc(i_d).dens3),2);
     dc(i_d).dens3(id,25)=0;
     idx2 = repmat(id,1,25) & id_nan;
 
@@ -329,17 +356,69 @@ for i_d=1:length(dc)
     
     dc(i_d).dens3(idx) = 10.^F(X(idx), Y(idx))-1;
     dc(i_d).dens3(idx2) = 10.^F(X(idx2), Y(idx2))-1;
+    dc(i_d).dens3(dc(i_d).dens3<0) = 0;
 end
 
 %Save 
 for i_d=1:numel(dc)
     dens3{i_d} = dc(i_d).dens3;
 end
-% save('data/dc_dens3','dens3');
+save('data/dc_dens3','dens3');
 
 
-% save('data/dc_corr','dc','start_date','end_date','quantity','-v7.3')
+save('data/dc_corr','dc','start_date','end_date','quantity','-v7.3')
 
 
+%% Export for online visualization
+for i_d=1:numel(dc)
+    fileID = fopen(['data/exportdDens_' dc(i_d).name '.json'],'w');
+    a=struct();
+    a.x=datestr(dc(i_d).time,'yyyy-mm-dd HH:MM');
+    a.y=dc(i_d).interval*(1/2:double(dc(i_d).levels));
+    b = log10(dc(i_d).dens);
+    b(dc(i_d).dens==0)=0;
+    b(b<0)=0;
+    a.data=round(b,2)';
+    fprintf(fileID,jsonencode(a));
+    fclose(fileID);
+end
+fileID = fopen('data/exportdRadars.json','w');
+fprintf(fileID,jsonencode({dc.name}));
+fclose(fileID);
 
+%% Clean velocity
+
+for i_d=1:numel(dc)
+    % Threashold speed : NOT APPLY HERE
+    % dc(i_d).ff(dc(i_d).ff>25)=nan;
+    
+    % Compute the n/s and e/w componenent of the flight speed
+    dc(i_d).u = dc(i_d).ff .* sind(dc(i_d).dd); % m/s | 0� is north and 90� is west. -> u is east (+) - west (-)
+    dc(i_d).v = dc(i_d).ff .* cosd(dc(i_d).dd); % m/s  -> v is north (+) - south (-)
+
+    dc(i_d).u(isnan(dc(i_d).dens3) | dc(i_d).dens3==0)=nan;
+    dc(i_d).v(isnan(dc(i_d).dens3) | dc(i_d).dens3==0)=nan;
+    
+    
+    % Interpolate temporally
+    tmp=conv2(~isnan(dc(i_d).u),ones(4*4,1),'same');
+    dc(i_d).u = fillmissing(dc(i_d).u,'linear');
+    dc(i_d).v = fillmissing(dc(i_d).v,'linear');
+    dc(i_d).u(tmp<4)=nan;
+    dc(i_d).v(tmp<4)=nan;
+    
+    % check that at direction is representatife of at least 50% of the bird
+    nb_bird = dc(i_d).dens3.* repmat(max(min(dc(1).alt-dc(i_d).heightDEM,200),0)/1000,numel(dc(i_d).time),1);
+    nb_bird_2=nb_bird;
+    nb_bird_2(isnan(dc(i_d).u))=nan;
+    id = nansum(nb_bird_2,2)<.5*nansum(nb_bird,2);
+    dc(i_d).u(id,:)=nan;
+    dc(i_d).v(id,:)=nan;
+   
+end
+
+% View result
+CleaningV(dc)
+
+save('data/dc_corr','dc','start_date','end_date','quantity','-v7.3')
 
