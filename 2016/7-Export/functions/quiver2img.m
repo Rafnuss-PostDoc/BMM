@@ -12,7 +12,7 @@ lat2D_res=imresize(g.lat2D,rzd);
 lon2D_res=imresize(g.lon2D,rzd);
 
 figure('position',[0 0 900 1000])
-for i=1627:size(u,3)
+for i=2:size(u,3)
     if sum(sum(u(:,:,i)))==0
         copyfile('./BMM_web/blank.png',['./BMM_web/' folder datestr(g.time(i),'yyyy-mm-dd-HH-MM') '_3857.png'])
     else

@@ -271,7 +271,7 @@ rzd =1/4;
 quiver2img(u,v,rzd,g,folder)
 
 load('../6-Flight/data/Flight_simulationMap_real_ll')
-folder='Quiver_sim2/';
+folder='Quiver_sim/';
 u = nan(g.nlat,g.nlon,g.nt);
 v = nan(g.nlat,g.nlon,g.nt);
 u(repmat(g.latlonmask,1,1,g.nt)) = real_u_ll(:,:,1);
