@@ -1,14 +1,14 @@
 % script
 
 
-load('data\dc_corr'); addpath('functions')
+load('data\dc_corr'); addpath('functions'); load coastlines.mat
 
 %% Analyse of the vertical profile
 fig=figure; hold on;
 isdecreasing=false(numel(dc),2);
 for i_d=1:numel(dc)
     id = dc(i_d).scatter_lim:25;
-    tmp = dc(i_d).dens3(:,id);%./repmat(nansum(dc(i_d).dens3(:,id),2),1,numel(id));
+    tmp = dc(i_d).dens4(:,id);%./repmat(nansum(dc(i_d).dens4(:,id),2),1,numel(id));
     
     subplot(1,2,1); hold on;
     it1=dc(i_d).time>datetime('01-March-2018') & dc(i_d).time<datetime('01-May-2018');
@@ -42,7 +42,7 @@ figure; hold on;
 plot(coastlon,coastlat,'k')
 for i_d=1:numel(dc)
     id = dc(i_d).scatter_lim:25;
-    tmp = dc(i_d).dens3(:,id);%./repmat(nansum(dc(i_d).dens3(:,id),2),1,numel(id));
+    tmp = dc(i_d).dens4(:,id);%./repmat(nansum(dc(i_d).dens4(:,id),2),1,numel(id));
 
     it1=dc(i_d).time>datetime('01-March-2018') & dc(i_d).time<datetime('01-May-2018');
     scatter3(dc(i_d).lon*ones(numel(id),1), dc(i_d).lat*ones(numel(id),1), dc(1).alt(id)-dc(i_d).heightDEM, [], nanmean(tmp(it1,:)), 'filled');
@@ -60,8 +60,8 @@ plot(y,x);
 
 for i_d=1:numel(dc)
     id = dc(i_d).scatter_lim:25;
-    it1=dc(i_d).time>datetime('01-March-2018') & dc(i_d).time<datetime('01-May-2018') & ~all(isnan(dc(i_d).dens3(:,id)),2)';
-    tmp = dc(i_d).dens3(it1,id);
+    it1=dc(i_d).time>datetime('01-March-2018') & dc(i_d).time<datetime('01-May-2018') & ~all(isnan(dc(i_d).dens4(:,id)),2)';
+    tmp = dc(i_d).dens4(it1,id);
     alt = dc(i_d).alt(id)-dc(i_d).heightDEM;
     
     for i_alt=1:numel(alt)
@@ -107,13 +107,13 @@ scoret = datenum(repmat(dc(1).time',1,numel(dc))-mean(cat(3,[dc.sunrise],[dc.sun
 tti = cell(1,numel(dc));
 ddi = cell(1,numel(dc));
 for i_d=1:numel(dc)
-    ddi{i_d} = dc(i_d).dens3;
+    ddi{i_d} = dc(i_d).dens4;
     ddi{i_d}(:,1:dc(i_d).scatter_lim-1)=nan;
     
     id = dc(i_d).alt > dc(i_d).heightDEM;
     tti{i_d} = ddi{i_d}(:,id);
     
-    MPS_full{i_d}=nan(numel(dc(i_d).time),size(dc(i_d).dens3,2),n_real);
+    MPS_full{i_d}=nan(numel(dc(i_d).time),size(dc(i_d).dens4,2),n_real);
 end
 
 days7 = datetime('31-December-2017 12:00'):7:datetime('01-January-2019 12:00');
@@ -191,14 +191,14 @@ for i_d=1:numel(dc)
     clf;
     
     subplot(1,2,1); hold on;
-    plot(nanmean(dc(i_d).dens3(it1,:)),dc(1).alt);
+    plot(nanmean(dc(i_d).dens4(it1,:)),dc(1).alt);
     plot(nanmean(mean(MPS{i_d}(it1,:,:),3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
     plot(nanmean(quantile(MPS{i_d}(it1,:,:),0.2,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
     plot(nanmean(quantile(MPS{i_d}(it1,:,:),0.8,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
     axis([0 30 0 5000]); title('Spring'); xlabel('Profile  dens'); ylabel('altitude [m]')
     
     subplot(1,2,2); hold on;
-    plot(nanmean(dc(i_d).dens3(it2,:)),dc(1).alt);
+    plot(nanmean(dc(i_d).dens4(it2,:)),dc(1).alt);
     plot(nanmean(mean(MPS{i_d}(it2,:,:),3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
     plot(nanmean(quantile(MPS{i_d}(it2,:,:),0.2,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
     plot(nanmean(quantile(MPS{i_d}(it2,:,:),0.8,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
@@ -314,22 +314,22 @@ zlim([zlim0 dc(i_d).height+700]);axis_t=axis; view(0,0)
 id = dc(i_d).scatter_lim:25;
 it1=dc(i_d).time>datetime('01-March-2018') & dc(i_d).time<datetime('01-May-2018');
 it2=dc(i_d).time>datetime('01-Sep-2018') & dc(i_d).time<datetime('01-Nov-2018');
-mu=nanmean(dc(i_d).u(it1,id) .* dc(i_d).dens3(it1,id) ./ repmat(nanmean(dc(i_d).dens3(it1,id)),sum(it1),1) );
-mv=nanmean(dc(i_d).v(it1,id) .* dc(i_d).dens3(it1,id) ./ repmat(nanmean(dc(i_d).dens3(it1,id)),sum(it1),1) );
+mu=nanmean(dc(i_d).u(it1,id) .* dc(i_d).dens4(it1,id) ./ repmat(nanmean(dc(i_d).dens4(it1,id)),sum(it1),1) );
+mv=nanmean(dc(i_d).v(it1,id) .* dc(i_d).dens4(it1,id) ./ repmat(nanmean(dc(i_d).dens4(it1,id)),sum(it1),1) );
 a = [zeros(numel(id),1) mu'/20 nan(numel(id),1)]';
 b = [zeros(numel(id),1) mv'/20 nan(numel(id),1)]';
 c = [dc(1).alt(id)' dc(1).alt(id)' nan(numel(id),1)]';
 plot3(dc(i_d).lon+a(:), dc(i_d).lat+b(:), c(:),'g','linewidth',3)
-mu=nanmean(dc(i_d).u(it2,id) .* dc(i_d).dens3(it2,id) ./ repmat(nanmean(dc(i_d).dens3(it2,id)),sum(it2),1) );
-mv=nanmean(dc(i_d).v(it2,id) .* dc(i_d).dens3(it2,id) ./ repmat(nanmean(dc(i_d).dens3(it2,id)),sum(it2),1) );
+mu=nanmean(dc(i_d).u(it2,id) .* dc(i_d).dens4(it2,id) ./ repmat(nanmean(dc(i_d).dens4(it2,id)),sum(it2),1) );
+mv=nanmean(dc(i_d).v(it2,id) .* dc(i_d).dens4(it2,id) ./ repmat(nanmean(dc(i_d).dens4(it2,id)),sum(it2),1) );
 a = [zeros(numel(id),1) mu'/1000*60*60/72 nan(numel(id),1)]';
 b = [zeros(numel(id),1) mv'/1000*60*60/111 nan(numel(id),1)]';
 plot3(dc(i_d).lon+a(:), dc(i_d).lat+b(:), c(:),'r','linewidth',3)
 axis(axis_t); set(gca,'DataAspectRatio',[1 1 300])
 subplot(1,4,4);  hold on;
-plot(nanmean(dc(i_d).dens3(it1,id)),dc(1).alt(id),'g','linewidth',3)
-plot(nanmean(dc(i_d).dens3(it2,id)),dc(1).alt(id),'r','linewidth',3);
-plot(nanmean(dc(i_d).dens3(:,id)),dc(1).alt(id));
+plot(nanmean(dc(i_d).dens4(it1,id)),dc(1).alt(id),'g','linewidth',3)
+plot(nanmean(dc(i_d).dens4(it2,id)),dc(1).alt(id),'r','linewidth',3);
+plot(nanmean(dc(i_d).dens4(:,id)),dc(1).alt(id));
 plot(0, dc(i_d).height,'o','MarkerFaceColor','r','MarkerEdgeColor','k','MarkerSize',10);
 ylim([zlim0 dc(i_d).height+700]);xlim([0 25])
 
@@ -361,83 +361,40 @@ save('data/VolBelow','VolBelow','alpha');
 
 save('data/dc_corr','dc','start_date','end_date','quantity','-v7.3')
 
-%% Checking result
 
-% First compute the surface density
-data.time = dc(1).time;
-data.alt = dc(1).alt;
-data.dens = reshape([dc.dens3],numel(data.time),numel(data.alt),[]);
-dd = reshape([dc.dd],numel(data.time),numel(data.alt),[]);
-
-% Load MPS result
-load('data/BelowRadarMPS')
-MPS = cellfun(@(x) 10.^(x)-1,MPS,'UniformOutput',false);
-data_denss_MPS=nan(numel(data.time),numel(dc),8);
-
-for i_d=1:numel(dc)
-    % Vertical agregation accounts for the DEM based on VolBelow.
-    % First, find the direction of flight of the lowest non-nan bin
-    dir=dd(:,:,i_d);
-    [~, id]  = max(~isnan(dir), [], 2);
-    dir_lowest = dir(sub2ind(size(dir), (1:size(dir,1))',id));
-    % Transform this direction angle (0-360°) into the index of alpha (-90°-90°)
-    dir_lowest_round = round(dir_lowest,-1);
-    id_alpha=nan(size(dir_lowest_round));
-    id_alpha(dir_lowest_round>=0 & dir_lowest_round<90) = dir_lowest_round(dir_lowest_round>=0 & dir_lowest_round<90)+90;
-    id_alpha(dir_lowest_round>=90 & dir_lowest_round<270) = dir_lowest_round(dir_lowest_round>=90 & dir_lowest_round<270)-90;
-    id_alpha(dir_lowest_round>=270 & dir_lowest_round<360) = dir_lowest_round(dir_lowest_round>=270 & dir_lowest_round<360)-270;
-    id_alpha = id_alpha/10+1;
-    height_vol = nan(size(data.dens(:,:,i_d)));
-    height_vol(~isnan(id_alpha),:) = dc(i_d).VolBelow(id_alpha(~isnan(id_alpha)),:);
+%% Export Zenodo
+dexp = dc;
+kep=false(numel(dc),numel(dc(1).time));
+for i_d=1:numel(dexp)
+    dexp(i_d).dens=dc(i_d).dens4;
+    dexp(i_d).densSIMmean = mean(MPS{i_d},3);
     
-    % Integrate volume density into surface density based on the direction and corresponding volume. bird/km^2
-    data.denss(:,i_d) = sum(data.dens(:,:,i_d) .* height_vol,2);
+    dexp(i_d).u=dexp(i_d).u2;
+    dexp(i_d).v=dexp(i_d).v2;
+    dexp(i_d).sd_vvp=dexp(i_d).sd_vvp2;
+    dexp(i_d).volDir=dexp(i_d).VolBelow;
     
-    % Computing with result of MPS
-    result = data.dens(:,:,i_d);
-    for i_real=1:8%size(MPS{i_d},3)
-        result(:,1:dc(i_d).scatter_lim) = MPS{i_d}(:,:,i_real);
-        data_denss_MPS(:,i_d,i_real) = sum(result .* height_vol,2);
-    end
-    
-    % old version, not taking volume below radar
-    tmp=diff(double([0 max(0, dc(1).alt+100 - dc(i_d).height )]))/1000;
-    data_denss_old(:,i_d) =data.dens(:,:,i_d) * tmp';
+    kep(i_d,:) = any(~isnan(dexp(i_d).dens'));
 end
 
+dexp = rmfield(dexp,{'DBZH','ff','dd','interval','scatter_lim','levels','dusk','dawn','sunset','sunrise','day','sd_vvp2','eta','u2','v2','dens2','dens3','dens4','time','alt','maxrange','VolBelow'});
 
-figure; histogram(data.denss(:)-data.denss2(:))
+for i_d=1:numel(d_exp)
+    
+    dexp(i_d).dens = round(dexp(i_d).dens(any(kep),:),2)';
+    dexp(i_d).sd_vvp = round(dexp(i_d).sd_vvp(any(kep),:),2)';
+    dexp(i_d).u = round(dexp(i_d).u(any(kep),:),2)';
+    dexp(i_d).v = round(dexp(i_d).v(any(kep),:),2)';
+    dexp(i_d).windu = round(dexp(i_d).windu(any(kep),:),2)';
+    dexp(i_d).windv = round(dexp(i_d).windv(any(kep),:),2)';
+    dexp(i_d).insect = round(dexp(i_d).insect(any(kep),:),2)';
+    dexp(i_d).densSIMmean = round(dexp(i_d).densSIMmean(any(kep),:),2)';
+    
+    fileID = fopen(['data/zenodo/dc_' dexp(i_d).name '.json'],'w');
+    fprintf(fileID,jsonencode(dexp(i_d)));
+    fclose(fileID);
+end
 
-figure;
-subplot(1,3,1);
-worldmap([floor(min([dc.lat])) ceil(max([dc.lat]))], [floor(min([dc.lon])) ceil(max([dc.lon]))]);
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-scatterm([dc.lat],[dc.lon],100,nanmean(data_denss_old),'filled','MarkerEdgeColor','k'); caxis([3 20]); title('Average with old method')
-subplot(1,3,2);
-worldmap([floor(min([dc.lat])) ceil(max([dc.lat]))], [floor(min([dc.lon])) ceil(max([dc.lon]))]);
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-scatterm([dc.lat],[dc.lon],100,nanmean(data.denss),'filled','MarkerEdgeColor','k'); caxis([3 20]); title('Average with new method')
-subplot(1,3,3);
-worldmap([floor(min([dc.lat])) ceil(max([dc.lat]))], [floor(min([dc.lon])) ceil(max([dc.lon]))]);
-geoshow('landareas.shp', 'FaceColor', [0.5 0.7 0.5])
-geoshow('worldrivers.shp','Color', 'blue')
-scatterm([dc.lat],[dc.lon],100,nanmean(mean(data_denss_MPS(:,:,:),3)),'filled','MarkerEdgeColor','k'); caxis([3 20]); title('Average with new method')
-
-figure;plot(nanstd(data.denss,[],2)-nanstd(data_denss_old,[],2));xlabel('time'); ylabel('difference of standard deviation (new-old)')
-
-
-% Figure MPS
-figure;
-ax1=subplot(4,1,1); imagesc(data.dens(:,1:(dc(i_d).scatter_lim+2),i_d)'); caxis([0 5])
-ax2=subplot(4,1,2); imagesc(MPS{i_d}(:,:,2)'); caxis([0 5])
-ax3=subplot(4,1,3); imagesc(MPS{i_d}(:,:,3)'); caxis([0 5])
-ax4=subplot(4,1,4); imagesc(MPS{i_d}(:,:,4)'); caxis([0 5]);
-linkaxes([ax1 ax2 ax3 ax4])
-
-figure(2); i_d=4; hold on
-plot(permute(data_denss_MPS(:,i_d,:),[1 3 2]),'--')
-plot(mean(data_denss_MPS(:,i_d,:),3),'-k')
-plot(data.denss(:,i_d),'k','linewidth',2)
-plot(data_denss_old(:,i_d),'r','linewidth',2)
+fileID = fopen('data/zenodo/time.json','w');
+fwrite(fileID,jsonencode(dc(1).time(any(kep))));
+fclose(fileID)

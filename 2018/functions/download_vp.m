@@ -82,6 +82,13 @@ for i_d=1:numel(d)
         
         for i_file = 1: numel(files)
             
+            % Check if file empty
+            try
+                h5info([files(i_file).folder '/' files(i_file).name],'/dataset1/');
+            catch
+                continue
+            end
+            
             % clc;h5disp([files(i_file).folder '/' files(i_file).name])
             
 %             % Time
