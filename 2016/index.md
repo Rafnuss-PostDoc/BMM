@@ -49,17 +49,17 @@ where $$\mu$$ and $$\iota$$ are deterministic trends (respectively at the multi-
 More details on the model are available in the manuscript or through the inference script (see below).
 
 ## Inference
-The inference of the model parameters is performed with this [MATLAB LiveScript](https://rafnuss-postdoc.github.io/BMM/MatlabLiveScript/Inference.html).
+The inference of the model parameters is performed with this [MATLAB LiveScript](https://rafnuss-postdoc.github.io/BMM/2016/MatlabLiveScript/Inference.html).
 
 ## Validation
-1. Cross-validation for each radar by ignoring the data of this radar and estimating the bird density at the same location and time [MATLAB LiveScript of cross-validation](https://rafnuss-postdoc.github.io/BMM/MatlabLiveScript/Cross_validation.html)
-2. Comparison with Birdscan radars [MATLAB LiveScript of validation with bird radar](https://rafnuss-postdoc.github.io/BMM/MatlabLiveScript/Validation_birdRadar.html)
+1. Cross-validation for each radar by ignoring the data of this radar and estimating the bird density at the same location and time [MATLAB LiveScript of cross-validation](https://rafnuss-postdoc.github.io/BMM/2016/MatlabLiveScript/Cross_validation.html)
+2. Comparison with Birdscan radars [MATLAB LiveScript of validation with bird radar](https://rafnuss-postdoc.github.io/BMM/2016/MatlabLiveScript/Validation_birdRadar.html)
 
 <img src="https://raw.githubusercontent.com/Rafnuss-PostDoc/BMM/master/2016/10-paper/figure/Figure4.png">
 <span style="font-size:0.8em;">Comparison of the estimated bird densities (black line) and their uncertainty range (10-90 quantiles in grey) with the bird densities (red dots) observed using dedicated bird radars at twolocations in (a) Herzeele, France (50◦53’05.6"N 2◦32’40.9"E) and (b) Sempach, Switzerland (47◦07’41.0"N8◦11’32.5"E). Note that because of the power transformation, model uncertainties are larger when the migration intensity is high.  It is therefore critical to account for the uncertainty ranges (light grey) when comparing the interpolation results with the bird radars observations (red dots).</span>
 
 ## Estimation and simulation
-Estimation on a 3D grid covering Europe is explained in the [MATLAB LiveScript of estimation](https://github.com/Rafnuss-PostDoc/BMM/MatlabLiveScript/Estimation_map.m). 
+Estimation on a 3D grid covering Europe is explained in the [MATLAB LiveScript of estimation](https://github.com/Rafnuss-PostDoc/BMM/2016/MatlabLiveScript/Estimation_map.m). 
 
 <img src="https://raw.githubusercontent.com/Rafnuss-PostDoc/BMM/master/2016/10-paper/figure/Figure5.png">
 <span style="font-size:0.8em;">Maps of bird density estimation every hour of a single night (3-4 October). The sunrise and sunset fronts are visible at 18:00 and 05:00 with lower densities close to the fronts and no value after thefront. The resemblance from hour-to-hour illustrates the high temporal continuity of the model. A rain cell above Poland blocked migration on the Eastern part of the domain. By contrast, a clear pathway is visible from Northern Germany through to Southwestern France.</span>
