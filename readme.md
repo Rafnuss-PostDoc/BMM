@@ -27,6 +27,9 @@ Interactive presentation of the methodology [rafnuss-postdoc.github.io/BMM/2016]
 
 ## Project 2 `/2018/`: BirdFlow
 
+**Introduction:**
+A short overview of what each script is for is available at [rafnuss-postdoc.github.io/BMM/2018](https://rafnuss-postdoc.github.io/BMM/2018)
+
 **Preprint:**
 > .
 
