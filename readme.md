@@ -15,7 +15,7 @@ Interactive presentation of the methodology [rafnuss-postdoc.github.io/BMM/2016]
 > Space-time interpolation of nocturnal bird migration. Raphaël Nussbaumer, Lionel Benoit, Grégoire Mariethoz, Felix Liechti, Baptiste  Schmid. *BOU 2019*. Warwick University. DOI: [10.13140/RG.2.2.11249.53605](https://doi.org/10.13140/RG.2.2.11249.53605).
 
 **Preprint:**
-> A geostatistical approach to estimate high resolution nocturnal bird migration densities from a weather radar network. Raphaël Nussbaumer, Lionel Benoit, Grégoire Mariethoz, Felix Liechti, Silke Bauer, Baptiste Schmid. bioRxiv 690065. DOI:[10.1101/690065](https://doi.org/10.1101/690065).
+> A geostatistical approach to estimate high resolution nocturnal bird migration densities from a weather radar network. Raphaël Nussbaumer, Lionel Benoit, Grégoire Mariethoz, Felix Liechti, Silke Bauer, Baptiste Schmid. *bioRxiv* 690065. DOI:[10.1101/690065](https://doi.org/10.1101/690065).
 
 **Paper:**
 > A Geostatistical Approach to Estimate High Resolution Nocturnal Bird Migration Densities from a Weather Radar Network. Nussbaumer, R.; Benoit, L.; Mariethoz, G.; Liechti, F.; Bauer, S.; Schmid, B. *Remote Sens*. **2019**, 11, 2233. DOI:[10.3390/rs11192233](https://doi.org/10.3390/rs11192233).
@@ -31,7 +31,7 @@ Interactive presentation of the methodology [rafnuss-postdoc.github.io/BMM/2016]
 A short overview of what each script is for is available at [rafnuss-postdoc.github.io/BMM/2018](https://rafnuss-postdoc.github.io/BMM/2018)
 
 **Preprint:**
-> .
+> Modelling the flow of nocturnal bird migration with year-round European weather radar network. Raphäel Nussbaumer, Lionel Benoit, Grégoire Mariethoz, Felix Liechti, Silke Bauer, Baptiste Schmid. *bioRxiv* 2020.10.13.321844. DOI:[10.1101/2020.10.13.321844](https://doi.org/10.1101/2020.10.13.321844).
 
 **Paper:**
 > .
