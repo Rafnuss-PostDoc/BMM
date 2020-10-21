@@ -446,7 +446,7 @@ CleaningV(d)
 
 
 
-%% Interpolate
+%% Correction for flight speed and sd_vvp
 
 r = 200; % ratio of correlation between vertical and time: 1 => 200m = 5minutes
 [X,Y]=meshgrid(linspace(1,r*25,25),1:numel(dc(i_d).time));
@@ -496,6 +496,8 @@ for i_d=1:numel(dc)
     dc(i_d).v(id,:)=nan;
     dc(i_d).sd_vvp2(id,:)=nan;
 end
+
+
 
 
 
