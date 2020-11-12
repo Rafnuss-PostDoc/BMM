@@ -1,13 +1,14 @@
 addpath('functions/')
 
 %% 1. Download value
-start_date='01-Jan-2018 00:00:00';
-end_date='01-Jan-2019 00:00:00';
+start_date='01-Jan-2020 00:00:00';
+end_date='01-Jan-2021 00:00:00';
 quantity = {'dens','ff','dd','DBZH','eta','sd_vvp'};
+folder_root = 'G:\Raphael_temp\'; % 'C:\Users\rnussba1\Documents\BMM\data\'
 
-d = download_vp(start_date,end_date, quantity);
+d = download_vp(start_date,end_date, quantity, folder_root);
 
-save('data/d2019all.mat','d','start_date','end_date','quantity','-v7.3');
+save('data/d2020all.mat','d','start_date','end_date','quantity','-v7.3');
 
 % Figure
 for i_d=1:numel(d)
@@ -753,7 +754,6 @@ parfor i_d=1:numel(dc)
     
     dc(i_d).dens4 = dc(i_d).dens3 .* (1-dc(i_d).insect);
     
-
     % Abritrary correction (adding up to 5.4m/s according to difference
     % between insect and bird. 
     coef = abs(diff(gmfit.mu(:,1)));

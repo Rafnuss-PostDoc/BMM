@@ -1,4 +1,4 @@
-function d = download_vp(start_date,end_date, quantity)
+function d = download_vp(start_date,end_date, quantity, folder_root)
 
 % Find available data
 websave('data/coverage.csv','https://lw-enram.s3-eu-west-1.amazonaws.com/coverage.csv');
@@ -14,9 +14,6 @@ for i_d = 1:numel(cr)
     tmp = datetime(d(i_d).date,'InputFormat','yyyy-MM');
     d(i_d).date(tmp<start_date | tmp>end_date,:)=[];
 end
-
-% folder location
-folder_root = 'F:\Rafnuss-tmp\'; % 'C:\Users\rnussba1\Documents\BMM\data\'
 
 for i_d=1:numel(d)
     

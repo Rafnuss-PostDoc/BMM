@@ -263,7 +263,7 @@ for i_d=1:numel(dc)
     id_s = id(id_any_1, id_any_2);
     DEM_id = DEM(id_any_1, id_any_2);
     DEM_id(~id_s)=0;
-    
+
     for i_alpha=1:numel(alpha)
         J = imrotate(id_s,alpha(i_alpha));
         % elevation in the direction of alpha
@@ -352,6 +352,30 @@ for i_d=1:numel(dc)
     %thetaticks('');
     title(dc(i_d).name)
 end
+
+% Figure: altitudinal coverage of the data
+V=nan(25,37);
+for i_d=1:numel(dc)
+    V(:,i_d)=mean(dc(i_d).VolBelow)/.2;
+end
+V=1-V;
+figure; hold on;
+imagesc(1:37,dc(1).alt,V,'AlphaData',abs(V))
+colormap(flipud(summer))%demcmap()
+plot(1:37,[dc.height],'ok','MarkerFaceColor','k')
+stairs(0.5:37.5,[dc.heightDEM dc(end).heightDEM],'-k','linewidth',3)
+stairs(0.5:37.5,dc(1).alt([dc.scatter_lim dc(end).scatter_lim])-100,'--r','linewidth',2)
+xticks(1:37)
+xticklabels({dc.name})
+yticks(dc(1).alt)
+ax = gca;
+ax.XGrid = 'off';
+ax.YGrid = 'on';
+xtickangle(90); axis tight
+ylim([0 1500])
+legend({'Radar','Ground','First bin with acceptable data'})
+c=colorbar; c.Label.String='Proportion of alt. bin under ground';
+
 
 %Save
 for i_d=1:numel(dc)
