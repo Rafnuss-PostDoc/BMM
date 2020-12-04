@@ -1,4 +1,7 @@
-<link rel="shortcut icon" type="image/x-icon" href="https://bmm.raphaelnussbaumer.com/assets/favicon.png">
+<head>  
+  <link rel="shortcut icon" type="image/png" href="https://bmm.raphaelnussbaumer.com/assets/favicon.png">
+  </head>
+
 
 
 # Bird Migration Map
