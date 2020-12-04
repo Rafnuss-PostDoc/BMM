@@ -386,39 +386,91 @@ save('data/VolBelow','VolBelow','alpha');
 save('data/dc_corr','dc','start_date','end_date','quantity','-v7.3')
 
 
-%% Export Zenodo
-dexp = dc;
-kep=false(numel(dc),numel(dc(1).time));
-for i_d=1:numel(dexp)
-    dexp(i_d).dens=dc(i_d).dens4;
-    dexp(i_d).densSIMmean = mean(MPS{i_d},3);
+%% Estimate total influence of elevation correction on MTR
+
+% Initiate empty density matrix
+data_denss_sim = nan(numel(dc(1).time),  numel(dc), size(MPS{1},3));
+data_MTRs_sim = data_denss_sim;
+data_denss = nan(numel(dc(1).time),  numel(dc));
+data_MTRs = data_denss;
+
+% Loop for eac radar
+for i_d=1:numel(dc)
+    % Vertical agregation accounts for the DEM based on VolBelow.
+    % First, find the direction of flight of the lowest non-nan bin
+    [~, id]  = max(~isnan(dc(i_d).dd), [], 2);
+    dir_lowest = dc(i_d).dd(sub2ind(size(dc(i_d).dd), (1:numel(dc(1).time))',id));
+    % Transform this direction angle (0-360°) into the index of alpha (-90°-90°)
+    dir_lowest_round = round(dir_lowest,-1);
+    id_alpha=nan(size(dir_lowest_round));
+    id_alpha(dir_lowest_round>=0 & dir_lowest_round<90) = dir_lowest_round(dir_lowest_round>=0 & dir_lowest_round<90)+90;
+    id_alpha(dir_lowest_round>=90 & dir_lowest_round<270) = dir_lowest_round(dir_lowest_round>=90 & dir_lowest_round<270)-90;
+    id_alpha(dir_lowest_round>=270 & dir_lowest_round<360) = dir_lowest_round(dir_lowest_round>=270 & dir_lowest_round<360)-270;
+    id_alpha = id_alpha/10+1;
+    height_vol = nan(numel(dc(1).time),numel(dc(1).alt));
+    height_vol(~isnan(id_alpha),:) = dc(i_d).VolBelow(id_alpha(~isnan(id_alpha)),:);
     
-    dexp(i_d).u=dexp(i_d).u2;
-    dexp(i_d).v=dexp(i_d).v2;
-    dexp(i_d).sd_vvp=dexp(i_d).sd_vvp2;
-    dexp(i_d).volDir=dexp(i_d).VolBelow;
+    % Integrate volume density into surface density based on the direction and corresponding volume. bird/km^2
+    % data.denss(:,i_d) = sum(data_dens(:,:,i_d) .* height_vol,2);
+
+   
+    % Interpolation speed down to the ground
+    v_g = sqrt( dc(i_d).v2.^2 + dc(i_d).u2.^2 );
+    id_min = find(diff(all(isnan(v_g)))==-1);
+    v_g(:,1:id_min)= repmat(v_g(:,id_min+1),1,id_min);
     
-    kep(i_d,:) = any(~isnan(dexp(i_d).dens'));
+    % Computing with result of MPS
+    tmp = dc(i_d).dens4;
+    data_denss_MPS = nan(size(tmp,1),size(MPS{i_d},3),size(tmp,2));
+    for i_real=1:size(MPS{i_d},3)
+        tmp(:,1:dc(i_d).scatter_lim-1) = MPS{i_d}(:,1:dc(i_d).scatter_lim-1,i_real);
+        data_denss_MPS(:,i_real,:) = tmp .* height_vol;
+        data_MTRs_sim(:,i_d,i_real) = nansum(tmp .* height_vol .* v_g,2);
+    end
+    data_denss_sim(:,i_d,:) = sum(data_denss_MPS,3);
+     
+    % Standar method
+    vidh = min(max(dc(1).alt+100-dc(i_d).heightDEM,0),200)/1000;
+    data_denss(:,i_d) = sum(dc(i_d).dens4 .* repmat(vidh,numel(dc(i_d).time),1),2);
+    data_MTRs(:,i_d) = nansum(dc(i_d).dens4 .* repmat(vidh,numel(dc(i_d).time),1) .* v_g,2);
 end
 
-dexp = rmfield(dexp,{'DBZH','ff','dd','interval','scatter_lim','levels','dusk','dawn','sunset','sunrise','day','sd_vvp2','eta','u2','v2','dens2','dens3','dens4','time','alt','maxrange','VolBelow'});
+diff_dens = data_denss_sim - repmat(data_denss,1,1,size(MPS{i_d},3));
+diff_MTR = data_MTRs_sim - repmat(data_MTRs,1,1,size(MPS{i_d},3));
 
-for i_d=1:numel(d_exp)
-    
-    dexp(i_d).dens = round(dexp(i_d).dens(any(kep),:),2)';
-    dexp(i_d).sd_vvp = round(dexp(i_d).sd_vvp(any(kep),:),2)';
-    dexp(i_d).u = round(dexp(i_d).u(any(kep),:),2)';
-    dexp(i_d).v = round(dexp(i_d).v(any(kep),:),2)';
-    dexp(i_d).windu = round(dexp(i_d).windu(any(kep),:),2)';
-    dexp(i_d).windv = round(dexp(i_d).windv(any(kep),:),2)';
-    dexp(i_d).insect = round(dexp(i_d).insect(any(kep),:),2)';
-    dexp(i_d).densSIMmean = round(dexp(i_d).densSIMmean(any(kep),:),2)';
-    
-    fileID = fopen(['data/zenodo/dc_' dexp(i_d).name '.json'],'w');
-    fprintf(fileID,jsonencode(dexp(i_d)));
-    fclose(fileID);
+% Figure
+tmp2s = nan(3,numel(dc));
+tmp2a = nan(3,numel(dc));
+figure;
+for i_d=1:numel(dc)
+    subplot(6,7,i_d)
+    % histogram(nansum(diff_dens(:,i_d,:))./nansum(data_denss(:,i_d)))
+    tmps=nansum(diff_MTR(1:end/2,i_d,:))./nansum(data_MTRs(1:end/2,i_d));
+    tmpa=nansum(diff_MTR(end/2:end,i_d,:))./nansum(data_MTRs(end/2:end,i_d));
+    tmp2s(:,i_d) = [mean(tmps) min(tmps) max(tmps)];
+    tmp2a(:,i_d) = [mean(tmpa) min(tmpa) max(tmpa)];
+    %histogram(tmp*100)
+    %xlabel(dc(i_d).name); xtickformat('percentage')
 end
 
-fileID = fopen('data/zenodo/time.json','w');
-fwrite(fileID,jsonencode(dc(1).time(any(kep))));
-fclose(fileID)
+figure; hold on;
+plot([0 0],[1 37],'--k')
+tmp3=tmp2s*100;
+errorbar(tmp3(1,:),1:numel(dc),[],[],tmp3(2,:)-tmp3(1,:),tmp3(3,:)-tmp3(1,:),'.k');
+scatter(tmp3(1,:),1:numel(dc),[],'o','filled')
+tmp3=tmp2a*100;
+errorbar(tmp3(1,:),1:numel(dc),[],[],tmp3(2,:)-tmp3(1,:),tmp3(3,:)-tmp3(1,:),'.k');
+scatter(tmp3(1,:),1:numel(dc),[],'o','filled')
+yticks(1:37); yticklabels({dc.name}); xtickformat('percentage'); ylim([0 38])
+ylabel('Radars'); xlabel('Relative change of mean MTR between new and old method')
+grid on; box on
+
+
+
+
+
+
+
+
+
+
