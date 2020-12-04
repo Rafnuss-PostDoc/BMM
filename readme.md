@@ -1,3 +1,6 @@
+<link rel="shortcut icon" type="image/x-icon" href="https://bmm.raphaelnussbaumer.com/assets/favicon.png">
+
+
 # Bird Migration Map
 
 Bird Migration Modelling is a research project which aims at modeling the spatio-temporal patterns of nocturnal bird migration using weather radars. The main website of this project is [bmm.raphaelnussbaumer.com](https://bmm.raphaelnussbaumer.com/).
@@ -42,6 +45,3 @@ A short overview of what each script is for is available at [rafnuss-postdoc.git
 
 ## Project 3 
 
-
-
-<link rel="shortcut icon" type="image/x-icon" href="https://bmm.raphaelnussbaumer.com/assets/favicon.png">
