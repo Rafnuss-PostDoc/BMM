@@ -8,14 +8,16 @@ Bauer<sup>1</sup> and [<i class="ai ai-orcid"></i>](https://orcid.org/0000-0002-
 - <sup>1</sup>Swiss Ornithological Institute, Sempach, Switzerland
 - <sup>2</sup>Institute of Earth Surface Dynamics, University of Lausanne, Lausanne, Switzerland
 
-### Links:
-[<i class="ai ai-biorxiv"></i> Biorxiv](https://www.biorxiv.org/content/),  [<i class="ai ai-researchgate"></i> Researchgate](https://www.researchgate.net/project/Bird-Migration-Modelling-BMM), [Demo](https://bmm.raphaelnussbaumer.com/2018), [](https://bmm.raphaelnussbaumer.com/2018).
-
+### Ouput:
+- [Visualization of the interpolation](https://bmm.raphaelnussbaumer.com/2018), [](https://bmm.raphaelnussbaumer.com/2018).
+- [<i class="ai ai-biorxiv"></i> Biorxiv Preprint](https://doi.org/10.1101/2020.10.13.321844)
+- Peer-reviewed publication (to come)
 
 
 ## Dataset selection and pre-processing
+These scripts performed the pre-processing explained in the [Supplementary Material 1](https://www.biorxiv.org/content/10.1101/2020.10.13.321844v1.supplementary-material). 
 
-1. [`script_download_cleaning.m`](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m)
+1. Download and cleaning ([`script_download_cleaning.m`](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m))
 - [L3-L10](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L3-L10): Download all data available on enram repository for the entire year of 2018.
 - [L50-L75](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L50-L75): Delete the data of all radar with aparrent error in them
 - [L96-L117](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L96-L117): Reshape data to be on a regular grid: 5min interval, same altitudinal bins.
@@ -25,21 +27,23 @@ Bauer<sup>1</sup> and [<i class="ai ai-orcid"></i>](https://orcid.org/0000-0002-
 - [L449-L498](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L449-L498): Cleaning of flight speed componenet and `sd_vvp` based on the clearning performed on density.
 - [L502-L771](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L502-L771): Insect removal procedure 
 
- 2. [`script_elevation_correction.m`](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m)
+ 2. Correction for elevation ([`script_elevation_correction.m`](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m))
 - [L91-L181](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m#L91-L181): MPS simulation for the lower elevation
 - [L212-L362](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m#L212-L362): Compute volume available for flight
 - [L365-L400](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m#L365-L400): Export data for Zenodo
 
-The final interpolated spatio-temporal map can also be downloaded from zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243397.svg)](https://doi.org/10.5281/zenodo.3243397).
+The final vertial profile of bird density and flight speed vector can also be downloaded from zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243397.svg)](https://doi.org/10.5281/zenodo.3243397).
 
 ## Interpolation
 See each livescript for more information.
-1. Inference of Bird density [`Density_inference.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/Density_inference)
-2. Interpolation of Bird density [`Density_estimationMap.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/Density_estimationMap)
+1. Inference of bird density [`Density_inference.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/Density_inference)
+2. Interpolation of bird density [`Density_estimationMap.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/Density_estimationMap)
 3. Inference of flight speed [`Flight_inference.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/Flight_inference)
 4. Interpolation of flight speed [`Flight_estimationMap.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/Flight_estimationMap)
+5. Simulation of bird density[`Density_simulation.m`](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/Density_simulation.m)
 
 ## Flow Model
-[`SinkSource.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/SinkSource)
+- Flow model for the estimation map [`SinkSource.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/SinkSource)
+- Flow model for the simulations map [`SinkSourceSimulation.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/SinkSourceSimulation)
 
 This file contains both the code to compute the fluxes and also produce the figures of the paper. 
