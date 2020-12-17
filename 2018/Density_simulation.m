@@ -397,7 +397,10 @@ for i_b=1:numel(data.block.date)
     tmp = sqrt(intra.f_trend_v(g_NNT(:,:,id),intra.beta_v(:,i_b)));
     tmp2 = intra.f_trend(g_NNT(:,:,id),intra.beta(:,i_b));
     
-    real_I(:,:,id,:) = real_In(:,:,id,:) .* repmat(tmp,1,1,1,nb_real) + repmat(tmp2,1,1,1,nb_real);
+    for i_real=1:nb_real
+        real_I(:,:,id,i_real) = real_In(:,:,id,i_real) .* tmp + tmp2;
+    end
+    % real_I(:,:,id,:) = real_In(:,:,id,:) .* repmat(tmp,1,1,1,nb_real) + repmat(tmp2,1,1,1,nb_real
 end
 
 
@@ -454,11 +457,16 @@ real_denst = real_A(:,:,g.day_id) + real_I;
 %     real_denst(real_denst<0)=nan;
 % end
 
-real_dens = interp1(trans.denst_axis,trans.dens_axis,real_denst,'pchip');
+real_dens = nan(size(real_denst),'single');
 
+for i_real = 1:nb_real
+    real_dens(:,:,:,i_real) = interp1(trans.denst_axis,trans.dens_axis,real_denst(:,:,:,i_real),'pchip');
+end
 
-% save('data/Density_simulationMap_reassemble','real_dens','-v7.3')
+%% Save
+% save('G:\Raphael_temp/Density_simulationMap_reassemble','real_dens','-v7.3')
 % load('data/Density_simulationMap_reassemble.mat')
+
 
 %% Figure
 
@@ -506,23 +514,3 @@ v.Quality = 75;
 open(v);
 writeVideo(v, Frame);
 close(v);
-
-
-%% Check sim vs est
-
-load('data/Density_estimationMap')
-
-% err sim
-% ok if transformed, slight asymetry if not. 
-err = reshape(gd.dens_est(repmat(g.latlonmask,1,1,g.nt)),sum(g.latlonmask(:)),g.nt).^pow - mean(real_dens_ll.^pow,3);
-histogram(err(:))
-err = reshape(gd.dens_est(repmat(g.latlonmask,1,1,g.nt)),sum(g.latlonmask(:)),g.nt) - mean(real_dens_ll,3);
-histogram(err(:))
-
-real_dens_ll_s=sort(real_dens_ll,3);
-
-err = reshape(gd.dens_q10(repmat(g.latlonmask,1,1,g.nt)),sum(g.latlonmask(:)),g.nt)-real_dens_ll_s(:,:,10);
-histogram(err(:))
-err = reshape(gd.dens_q90(repmat(g.latlonmask,1,1,g.nt)),sum(g.latlonmask(:)),g.nt)-real_dens_ll_s(:,:,90);
-histogram(err(:))
-
