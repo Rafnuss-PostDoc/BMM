@@ -14,8 +14,8 @@ Bauer<sup>1</sup> and [<i class="ai ai-orcid"></i>](https://orcid.org/0000-0002-
 - Peer-reviewed publication (to come)
 
 
-## Dataset selection and pre-processing
-These scripts performed the pre-processing explained in the [Supplementary Material 1](https://www.biorxiv.org/content/10.1101/2020.10.13.321844v1.supplementary-material). 
+## Data Pre-processing
+These scripts perform the pre-processing explained in the [Supplementary Material 1](https://www.biorxiv.org/content/10.1101/2020.10.13.321844v1.supplementary-material). 
 
 1. Download and cleaning ([`script_download_cleaning.m`](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m))
 - [L3-L10](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L3-L10): Download all data available on enram repository for the entire year of 2018.
@@ -35,7 +35,9 @@ These scripts performed the pre-processing explained in the [Supplementary Mater
 The final vertial profile of bird density and flight speed vector can also be downloaded from zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243397.svg)](https://doi.org/10.5281/zenodo.3243397).
 
 ## Interpolation
+These scripts perform the interpolation explained in the [Supplementary Material 2](https://www.biorxiv.org/content/10.1101/2020.10.13.321844v1.supplementary-material). 
 See each livescript for more information.
+
 1. Inference of bird density [`Density_inference.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/Density_inference)
 2. Interpolation of bird density [`Density_estimationMap.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/Density_estimationMap)
 3. Inference of flight speed [`Flight_inference.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/Flight_inference)
