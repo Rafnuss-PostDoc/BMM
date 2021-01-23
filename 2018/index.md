@@ -1,17 +1,24 @@
 ---
-title: Modelling the flow of nocturnal bird migration with year-round European weather radar network.
+title: 2018
 ---
 
 # Modelling the flow of nocturnal bird migration with year-round European weather radar network.
-[<i class="ai ai-orcid"></i>](https://orcid.org/0000-0002-8185-1020){:target="_blank"}Raphaël Nussbaumer<sup>1,2</sup> , [<i class="ai ai-orcid"></i>](https://orcid.org/0000-0002-8182-0152){:target="_blank"}Lionel Benoit<sup>2</sup> , [<i class="ai ai-orcid"></i>](https://orcid.org/0000-0002-8820-2808){:target="_blank"}Grégoire Mariethoz<sup>2</sup> , [<i class="ai ai-orcid"></i>](https://orcid.org/0000-0001-9473-0837){:target="_blank"}Felix Liechti<sup>1</sup> , [<i class="ai ai-orcid"></i>](https://orcid.org/0000-0002-0844-164X){:target="_blank"}Silke
-Bauer<sup>1</sup> and [<i class="ai ai-orcid"></i>](https://orcid.org/0000-0002-7736-7527){:target="_blank"}Baptiste Schmid<sup>1</sup>
-- <sup>1</sup>Swiss Ornithological Institute, Sempach, Switzerland
-- <sup>2</sup>Institute of Earth Surface Dynamics, University of Lausanne, Lausanne, Switzerland
+[<i class="ai ai-orcid" style="color: #a6ce39;"></i>](https://orcid.org/0000-0002-8185-1020){:target="_blank"}Raphaël Nussbaumer<sup>1,2</sup> , [<i class="ai ai-orcid" style="color: #a6ce39;"></i>](https://orcid.org/0000-0002-8182-0152){:target="_blank"}Lionel Benoit<sup>2</sup> , [<i class="ai ai-orcid" style="color: #a6ce39;"></i>](https://orcid.org/0000-0002-8820-2808){:target="_blank"}Grégoire Mariethoz<sup>2</sup> , [<i class="ai ai-orcid"></i>](https://orcid.org/0000-0001-9473-0837){:target="_blank"}Felix Liechti<sup>1</sup> , [<i class="ai ai-orcid" style="color: #a6ce39;"></i>](https://orcid.org/0000-0002-0844-164X){:target="_blank"}Silke
+Bauer<sup>1</sup> and [<i class="ai ai-orcid" style="color: #a6ce39;"></i>](https://orcid.org/0000-0002-7736-7527){:target="_blank"}Baptiste Schmid<sup>1</sup>
 
-### Ouput:
-- [Visualization of the interpolation](https://bmm.raphaelnussbaumer.com/2018), [](https://bmm.raphaelnussbaumer.com/2018).
-- [<i class="ai ai-biorxiv"></i> Biorxiv Preprint](https://doi.org/10.1101/2020.10.13.321844)
-- Peer-reviewed publication (to come)
+<sup>1</sup>[Swiss Ornithological Institute, Sempach, Switzerland](https://www.vogelwarte.ch/), <sup>2</sup>[Institute of Earth Surface Dynamics, University of Lausanne, Lausanne, Switzerland](https://wp.unil.ch/gaia)
+
+**Corresponding author**: Raphaël Nussbaumer ([raphael.nussbaumer@vogelwarte.ch](mailto:raphael.nussbaumer@vogelwarte.ch))
+
+---
+
+## Ouput:
+- [Visualization of the interpolation](https://bmm.raphaelnussbaumer.com/2018).
+- [<i class="ai ai-biorxiv"></i> BioRxiv Preprint](https://doi.org/10.1101/2020.10.13.321844)
+
+<div data-badge-popover="right" data-badge-type="1" data-doi="10.1101/2020.10.13.321844" data-condensed="true" data-hide-no-mentions="true" class="altmetric-embed"></div>
+
+
 
 
 ## Data Pre-processing
@@ -48,4 +55,6 @@ See each livescript for more information.
 - Flow model for the estimation map [`SinkSource.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/SinkSource)
 - Flow model for the simulations map [`SinkSourceSimulation.mlx`](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/SinkSourceSimulation)
 
-This file contains both the code to compute the fluxes and also produce the figures of the paper. 
+These files contain both the code to compute the fluxes and also the figures of the paper. 
+
+<script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
