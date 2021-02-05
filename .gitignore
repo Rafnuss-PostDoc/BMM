@@ -2,12 +2,19 @@
 *.mat
 *.m~
 *.nc
+**/.idea/*
+
+# Large data
 2016/7-export/BMM_web/*
 2016/7-export/zenodo/*
 2018/data/*
 2018/old/* 
-2018/comparison_Birdscan/cosmo/*
-**/.idea/*
+
+# All dataset of BS or SF or cosmo
+2018/comparison_Birdscan/**/*.zip 
+2018/comparison_Birdscan/**/*.csv
+2018/comparison_Birdscan/**/*.mdb
+
 
 # Windows image file caches
 Thumbs.db
