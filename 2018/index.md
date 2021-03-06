@@ -26,20 +26,18 @@ These scripts perform the pre-processing explained in the [Supplementary Materia
 
 1. Download and cleaning ([`script_download_cleaning.m`](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m))
 - [L3-L10](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L3-L10): Download all data available on enram repository for the entire year of 2018.
-- [L50-L75](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L50-L75): Delete the data of all radar with aparrent error in them
-- [L96-L117](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L96-L117): Reshape data to be on a regular grid: 5min interval, same altitudinal bins.
-- [L119-L157](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L119-L157): Compute sunrise and sunset at each radar location
-- [L256-L277](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L256-L277): Manually clean the data (use a MATLAB app `CleaningV.mlapp`)
-- [L281-L345](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L281-L345): More automatic post-cleaning processing: removal of single data point isolated by 30min. Noise removal (replace value exeeding twice the average of 8 surounding values by the mean of the surounding values), interpolate to 5000m.
-- [L449-L498](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L449-L498): Cleaning of flight speed componenet and `sd_vvp` based on the clearning performed on density.
-- [L502-L771](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L502-L771): Insect removal procedure 
+- [L50-L76](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L50-L76): Delete the data of all radar with aparrent error in them
+- [L97-L118](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L97-L118): Reshape data to be on a regular grid: 5min interval, same altitudinal bins.
+- [L120-L158](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L120-L158): Compute sunrise and sunset at each radar location
+- [L248-L278](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L248-L278): Manually clean the data (use a MATLAB app `CleaningV.mlapp`)
+- [L281-L346](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L281-L346): More automatic post-cleaning processing: removal of single data point isolated by 30min. Noise removal (replace value exeeding twice the average of 8 surounding values by the mean of the surounding values), interpolate to 5000m.
+- [L439-L488](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L439-L488): Cleaning of flight speed componenet and `sd_vvp` based on the clearning performed on density.
 
  2. Correction for elevation ([`script_elevation_correction.m`](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m))
-- [L91-L181](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m#L91-L181): MPS simulation for the lower elevation
-- [L212-L362](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m#L212-L362): Compute volume available for flight
-- [L365-L400](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m#L365-L400): Export data for Zenodo
+- [L91-L170](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m#L91-L170): MPS simulation for the lower elevation
+- [L231-L381](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_elevation_correction.m#L231-L381): Compute volume available for flight
 
-The final vertial profile of bird density and flight speed vector can also be downloaded from zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243397.svg)](https://doi.org/10.5281/zenodo.3243397).
+The final vertial profile of bird density and flight speed vector can also be downloaded from zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3243396.svg)](https://doi.org/10.5281/zenodo.3243396).
 
 ## Interpolation
 These scripts perform the interpolation explained in the [Supplementary Material 2](https://www.biorxiv.org/content/10.1101/2020.10.13.321844v1.supplementary-material). 
