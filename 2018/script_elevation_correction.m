@@ -188,25 +188,44 @@ fig=figure; hold on;
 it1=dc(1).time>datetime('01-March-2018') & dc(1).time<datetime('01-May-2018');
 it2=dc(1).time>datetime('01-Sep-2018') & dc(1).time<datetime('01-Nov-2018');
 for i_d=1:numel(dc)
-    clf;
-    
-    subplot(1,2,1); hold on;
-    plot(nanmean(dc(i_d).dens4(it1,:)),dc(1).alt);
-    plot(nanmean(mean(MPS{i_d}(it1,:,:),3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
-    plot(nanmean(quantile(MPS{i_d}(it1,:,:),0.2,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
-    plot(nanmean(quantile(MPS{i_d}(it1,:,:),0.8,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
-    axis([0 30 0 5000]); title('Spring'); xlabel('Profile  dens'); ylabel('altitude [m]')
-    
-    subplot(1,2,2); hold on;
-    plot(nanmean(dc(i_d).dens4(it2,:)),dc(1).alt);
-    plot(nanmean(mean(MPS{i_d}(it2,:,:),3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
-    plot(nanmean(quantile(MPS{i_d}(it2,:,:),0.2,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
-    plot(nanmean(quantile(MPS{i_d}(it2,:,:),0.8,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
-    axis([0 30 0 5000]); title('Autumn');xlabel('Profile  dens'); ylabel('altitude [m]')
-    
-    keyboard;
+    %clf;
+    if size(MPS{i_d},2)~= 0
+        subplot(1,2,1); hold on;
+        plot(nanmean(dc(i_d).dens4(it1,:)),dc(1).alt);
+        plot(nanmean(mean(MPS{i_d}(it1,:,:),3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
+        plot(nanmean(quantile(MPS{i_d}(it1,:,:),0.2,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
+        plot(nanmean(quantile(MPS{i_d}(it1,:,:),0.8,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
+        axis([0 30 0 5000]); title('Spring'); xlabel('Profile  dens'); ylabel('altitude [m]')
+
+        subplot(1,2,2); hold on;
+        plot(nanmean(dc(i_d).dens4(it2,:)),dc(1).alt);
+        plot(nanmean(mean(MPS{i_d}(it2,:,:),3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
+        plot(nanmean(quantile(MPS{i_d}(it2,:,:),0.2,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
+        plot(nanmean(quantile(MPS{i_d}(it2,:,:),0.8,3)),dc(1).alt(1:dc(i_d).scatter_lim),'--');
+        axis([0 30 0 5000]); title('Autumn');xlabel('Profile  dens'); ylabel('altitude [m]')
+    end
+    % keyboard;
 end
 
+
+fig=figure; hold on;
+it(1,:)=dc(1).time>datetime('01-March-2018') & dc(1).time<datetime('01-May-2018');
+it(2,:)=dc(1).time>datetime('01-Sep-2018') & dc(1).time<datetime('01-Nov-2018');
+for i_d=1:numel(dc)
+    %clf;
+    if size(MPS{i_d},2)~= 0
+        for s=1:2
+            subplot(1,2,s); hold on;
+            plot(nanmean(dc(i_d).dens4(it(s,:),:)),dc(1).alt-dc(i_d).heightDEM);
+            y = dc(1).alt(1:dc(i_d).scatter_lim)-dc(i_d).heightDEM;
+            x1=nanmean(quantile(MPS{i_d}(it(s,:),:,:),0.1,3));
+            x2=nanmean(quantile(MPS{i_d}(it(s,:),:,:),0.9,3));
+            fill( [x1 fliplr(x2)], [y fliplr(y)],'k')
+            plot(nanmean(mean(MPS{i_d}(it(s,:),:,:),3)),y,'--');
+            axis([0 30 -500 2000]); title('Spring'); xlabel('Profile  dens'); ylabel('altitude [m]')
+        end
+    end
+end
 
 
 %% Get elevatation around
@@ -353,6 +372,20 @@ for i_d=1:numel(dc)
     title(dc(i_d).name)
 end
 
+
+%Save
+for i_d=1:numel(dc)
+    VolBelow(i_d,:,:) = dc(i_d).VolBelow;
+end
+save('data/VolBelow','VolBelow','alpha');
+save('data/dc_corr','dc','start_date','end_date','quantity','-v7.3')
+
+
+%% Figures
+load('data/dc_corr')
+load('data/VolBelow')
+load('./data/BelowRadarMPS.mat'); 
+
 % Figure: altitudinal coverage of the data
 V=nan(25,37);
 for i_d=1:numel(dc)
@@ -360,8 +393,9 @@ for i_d=1:numel(dc)
 end
 V=1-V;
 figure; hold on;
-imagesc(1:37,dc(1).alt,V,'AlphaData',abs(V))
-colormap(flipud(summer))%demcmap()
+surf(1:37,dc(1).alt,V)
+tmp = linspace(1,0,64)';
+colormap( tmp.*ones(64,3) + (1-tmp).*flipud(summer))%demcmap()
 plot(1:37,[dc.height],'ok','MarkerFaceColor','k')
 stairs(0.5:37.5,[dc.heightDEM dc(end).heightDEM],'-k','linewidth',3)
 stairs(0.5:37.5,dc(1).alt([dc.scatter_lim dc(end).scatter_lim])-100,'--r','linewidth',2)
@@ -377,17 +411,9 @@ legend({'Radar','Ground','First bin with acceptable data'})
 c=colorbar; c.Label.String='Proportion of alt. bin under ground';
 
 
-%Save
-for i_d=1:numel(dc)
-    VolBelow(i_d,:,:) = dc(i_d).VolBelow;
-end
-save('data/VolBelow','VolBelow','alpha');
-
-save('data/dc_corr','dc','start_date','end_date','quantity','-v7.3')
 
 
-%% Estimate total influence of elevation correction on MTR
-
+% Estimate total influence of elevation correction on MTR
 % Initiate empty density matrix
 data_denss_sim = nan(numel(dc(1).time),  numel(dc), size(MPS{1},3));
 data_MTRs_sim = data_denss_sim;
@@ -415,7 +441,7 @@ for i_d=1:numel(dc)
 
    
     % Interpolation speed down to the ground
-    v_g = sqrt( dc(i_d).v2.^2 + dc(i_d).u2.^2 );
+    v_g = sqrt( dc(i_d).vb.^2 + dc(i_d).ub.^2 );
     id_min = find(diff(all(isnan(v_g)))==-1);
     v_g(:,1:id_min)= repmat(v_g(:,id_min+1),1,id_min);
     
@@ -443,7 +469,7 @@ tmp2s = nan(3,numel(dc));
 tmp2a = nan(3,numel(dc));
 figure;
 for i_d=1:numel(dc)
-    subplot(6,7,i_d)
+    % subplot(6,7,i_d)
     % histogram(nansum(diff_dens(:,i_d,:))./nansum(data_denss(:,i_d)))
     tmps=nansum(diff_MTR(1:end/2,i_d,:))./nansum(data_MTRs(1:end/2,i_d));
     tmpa=nansum(diff_MTR(end/2:end,i_d,:))./nansum(data_MTRs(end/2:end,i_d));
