@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 import cdsapi
+import os
 
+os.chdir('/mnt/c/Users/rnussba1/switchdrive/BMM/WindSupport/ECMWF')
+
+# https://cds.climate.copernicus.eu/api-how-to
 c = cdsapi.Client()
 data = c.retrieve(
     'reanalysis-era5-single-levels',
@@ -23,11 +27,13 @@ data = c.retrieve(
     {
         'product_type':'reanalysis',
         'variable':[
-            'u_component_of_wind', 'v_component_of_wind'
+            'u_component_of_wind', 'v_component_of_wind', 'temperature'
         ],
         'pressure_level':[
-            #"1000","975","950","925","900","875"
-            "850","825","800","775","750","700","650","600","550"
+            #"1000","975","950","925", #-> 2018_pressure_1
+            #"900","875","850","825", #-> 2018_pressure_2
+            #"800","775","750","700" #-> 2018_pressure_3
+            "650","600","550","500" #-> 2018_pressure_4
         ],
         'year': '2018',
         'month': ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
@@ -35,7 +41,7 @@ data = c.retrieve(
         'time': [ '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
         'format': 'netcdf',
         'area': [55, -5, 43, 14],  # North, West, South, East. Default: global
-    }, "2018_pressure_2.nc")
+    }, "2018_pressure_4.nc")
 
 
 
