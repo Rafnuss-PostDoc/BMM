@@ -11,8 +11,8 @@ All publications and update of the project are available on [ResearchGate](https
 
 This repository is divided in the following projects
 
-## Project 1: `/2016/`
-The first project focuses on developing a geostatisctial model to interpolate bird densities at high resolution. Interactive presentation of the methodology is presented at [rafnuss-postdoc.github.io/BMM/2016](https://rafnuss-postdoc.github.io/BMM/2016)
+## Project 1: Interpolation
+The first project (`/2016/`)focuses on developing a geostatisctial model to interpolate bird densities at high resolution. Interactive presentation of the methodology is presented at [rafnuss-postdoc.github.io/BMM/2016](https://rafnuss-postdoc.github.io/BMM/2016)
 
 **Presentation:**
 > Space-time interpolation of nocturnal bird migration. Raphaël Nussbaumer, Lionel Benoit, Grégoire Mariethoz, Felix Liechti, Baptiste  Schmid. *BOU 2019*. Warwick University. DOI: [10.13140/RG.2.2.11249.53605](https://doi.org/10.13140/RG.2.2.11249.53605).
@@ -28,12 +28,12 @@ The first project focuses on developing a geostatisctial model to interpolate bi
 
 
 
-## Project 2: `/2018/`
+## Project 2: Birdflow
 
-In the second project, we use a flow model (from fluid dynamic) to quantifies the flow of birds taking-off and landing accross western Europe. A short overview of what each script is for is available at [rafnuss-postdoc.github.io/BMM/2018](https://rafnuss-postdoc.github.io/BMM/2018).
+In the second project (`/2018/`), we use a flow model (from fluid dynamic) to quantifies the flow of birds taking-off and landing accross western Europe. A short overview of what each script is for is available at [rafnuss-postdoc.github.io/BMM/2018](https://rafnuss-postdoc.github.io/BMM/2018).
 
 **Preprint:**
-> Modelling the flow of nocturnal bird migration with year-round European weather radar network. Raphäel Nussbaumer, Lionel Benoit, Grégoire Mariethoz, Felix Liechti, Silke Bauer, Baptiste Schmid. *bioRxiv* 2020.10.13.321844. DOI:[10.1101/2020.10.13.321844](https://doi.org/10.1101/2020.10.13.321844).
+> Quantifying year-round nocturnal bird migration with a fluid dynamics model. Raphäel Nussbaumer, Silke Bauer, Lionel Benoit, Grégoire Mariethoz, Felix Liechti, Baptiste Schmid. *bioRxiv* 2020.10.13.321844. DOI:[10.1101/2020.10.13.321844](https://doi.org/10.1101/2020.10.13.321844).
 
 **Paper:**
 > .
@@ -42,13 +42,16 @@ In the second project, we use a flow model (from fluid dynamic) to quantifies th
 [bmm.raphaelnussbaumer.com/2018](https://bmm.raphaelnussbaumer.com/2018)
 
 
-## Project 3: Bird, Insects and weather
+## Project 3: Separation of birds, insects and weathers
 
 This smaller third project is presenting a method to differentiate bird, insect and weather in weather radar data based on doppler product (airpseed and standard deviation of radar velocity. The MATLAB code an be found at [rafnuss-postdoc.github.io/BMM/2018/LiveScript/Insect_removal](https://rafnuss-postdoc.github.io/BMM/2018/LiveScript/Insect_removal.html).
 
 **Preprint:**
-> .
+> A simple method to separate birds and insects in single-pol weather radar data. Raphäel Nussbaumer, Baptiste Schmid, Silke Bauer, Felix Liechti. *bioRxiv* 2021.03.08.434434. DOI:[10.1101/2021.03.08.434434](https://doi.org/10.1101/2021.03.08.434434).
 
 **Paper:**
 > .
   
+## Project 4: Windsupport
+
+Study the influence of windspeed on groundspeed and airspeed in time and space. The MATLAB code an be found at [rafnuss-postdoc.github.io/BMM/WindSupport/HTML/script](https://rafnuss-postdoc.github.io/BMM/WindSupport/HTML/script.html).
