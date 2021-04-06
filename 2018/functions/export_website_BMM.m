@@ -48,10 +48,19 @@ F.properties={};
 F.geometry.type="Point";
 
 tmp=[g.lon2D(g.latlonmask) g.lat2D(g.latlonmask)];
+zoom=nan(g.nlat, g.nlon);
+ii=[1 2 4 8 16 32 64 128];
+for i=1:numel(ii)
+    zoom(1:ii(i):end,1:ii(i):end)=numel(ii)-i;
+end
+zoom(~g.latlonmask)=nan;
+imagesc(zoom<7); colorbar
+zoom = zoom(g.latlonmask);
 
 for i=1:size(tmp,1)
     F.properties.angle=round(rand(1)*365);
     F.properties.size=round(rand(1),2);
+    F.properties.zoom=zoom(i);
     F.geometry.coordinates = tmp(i,:);
     FC.features=[FC.features;F];
 end
