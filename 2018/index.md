@@ -22,7 +22,7 @@ Bauer<sup>1</sup> and [<i class="ai ai-orcid" style="color: #a6ce39;"></i>](http
 
 
 ## Data Pre-processing
-These scripts perform the pre-processing explained in the [Supplementary Material 1](https://www.biorxiv.org/content/10.1101/2020.10.13.321844v1.supplementary-material). 
+These scripts perform the pre-processing explained in the [Supplementary Material 1](https://www.biorxiv.org/content/10.1101/2020.10.13.321844v2.supplementary-material). 
 
 1. Download and cleaning ([`script_download_cleaning.m`](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m))
 - [L3-L10](https://github.com/Rafnuss-PostDoc/BMM/blob/master/2018/script_download_cleaning.m#L3-L10): Download all data available on enram repository for the entire year of 2018.
