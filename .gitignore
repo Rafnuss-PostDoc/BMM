@@ -3,6 +3,7 @@
 *.m~
 *.nc
 **/.idea/*
+2016/Publication/*
 
 # Large data
 2016/7-export/BMM_web/*
