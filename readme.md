@@ -6,7 +6,7 @@
 
 # Bird Migration Map
 
-Bird Migration Modelling is a research project which aims at modeling the spatio-temporal patterns of nocturnal bird migration using weather radars. The main website of this project is [bmm.raphaelnussbaumer.com](https://bmm.raphaelnussbaumer.com/).
+Bird Migration Modelling is a research project which aims at modeling the spatio-temporal patterns of nocturnal bird migration using weather radars. The main website of this project is [bmm.raphaelnussbaumer.com](http://bmm.raphaelnussbaumer.com/).
 All publications and update of the project are available on [ResearchGate](https://www.researchgate.net/project/Bird-Migration-Modelling-BMM).
 
 This repository is divided in the following projects
