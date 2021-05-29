@@ -50,7 +50,7 @@ This smaller third project is presenting a method to differentiate bird, insect 
 > A simple method to separate birds and insects in single-pol weather radar data. Raphäel Nussbaumer, Baptiste Schmid, Silke Bauer, Felix Liechti. *bioRxiv* 2021.03.08.434434. DOI:[10.1101/2021.03.08.434434](https://doi.org/10.1101/2021.03.08.434434).
 
 **Paper:**
-> .
+>  A Gaussian Mixture Model to Separate Birds and Insects in Single-Polarization Weather Radar Data. Raphäel Nussbaumer, Baptiste Schmid, Silke Bauer, Felix Liechti. *Remote Sens*. **2021**, 13(10), 1989. DOI:[10.3390/rs13101989](https://doi.org/10.3390/rs13101989).
   
 ## Project 4: Windsupport
 
