@@ -55,3 +55,19 @@ This smaller third project is presenting a method to differentiate bird, insect 
 ## Project 4: Windsupport
 
 Study the influence of windspeed on groundspeed and airspeed in time and space. The MATLAB code an be found at [rafnuss-postdoc.github.io/BMM/WindSupport/HTML/script](https://rafnuss-postdoc.github.io/BMM/WindSupport/HTML/script.html).
+
+
+## Project 5: Particle Tracking
+
+Using the interpolated departure, flight and landing information, we can generate particles in the flow to estimate individual-based information (length of journey, duration,etc...).
+This project is still at an early stage and I am not working a lot on it. 
+You can find the current code at [rafnuss-postdoc.github.io/BMM/Particle/HTML/Particle_tracking.html](https://rafnuss-postdoc.github.io/BMM/Particle/HTML/Particle_tracking.html) and the webdemo of the particle trajectory at [flowmap.blue](https://flowmap.blue/1de5uGWfZKLLIUqmodfHjps240PC9sRwwp1IqcbVXZRY?v=48.875000,5.375000,4.96,0,0&a=1&as=1&b=1&bo=75&c=1&ca=0&cz=3&d=1&fe=1&lt=0&lfm=ALL&t=20180307T000000,20180315T000000&col=Oranges&f=50)
+
+
+## Project 6: Windfarm
+
+We combine birdflow map with the windturbine map to estime the number of bird at risk of collision (i.e., birds flying through wind turbine swept area) and simulatanously, the potential power production. The methodology is seperated in three steps:
+
+ 1. [Windfarm processing](https://rafnuss-postdoc.github.io/BMM/WindFarm/HTML/1_windfarm_processing)
+ 2. [Interpolation of bird density at windturbine altitude](https://rafnuss-postdoc.github.io/BMM/WindFarm/HTML/2_interpolate_height_ratio.html)
+ 3. [Estimate the number of birds at risk](https://rafnuss-postdoc.github.io/BMM/WindFarm/HTML/3_bird_at_risk.html)
