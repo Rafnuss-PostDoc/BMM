@@ -13,12 +13,9 @@ Bauer<sup>1</sup> and [<i class="ai ai-orcid" style="color: #a6ce39;"></i>](http
 ---
 
 ## Ouput:
+- [Publication in J. R. Soc. Interface](https://royalsocietypublishing.org/doi/10.1098/rsif.2021.0194) <div data-badge-popover="right" data-badge-type="1" data-doi="10.1098/rsif.2021.0194" data-condensed="true" data-hide-no-mentions="true" class="altmetric-embed"></div>
 - [Visualization of the interpolation](https://bmm.raphaelnussbaumer.com/2018).
-- [<i class="ai ai-biorxiv"></i> BioRxiv Preprint](https://doi.org/10.1101/2020.10.13.321844)
-
-<div data-badge-popover="right" data-badge-type="1" data-doi="10.1101/2020.10.13.321844" data-condensed="true" data-hide-no-mentions="true" class="altmetric-embed"></div>
-
-
+- [<i class="ai ai-biorxiv"></i> BioRxiv Preprint](https://doi.org/10.1101/2020.10.13.321844) <div data-badge-popover="right" data-badge-type="1" data-doi="10.1101/2020.10.13.321844" data-condensed="true" data-hide-no-mentions="true" class="altmetric-embed"></div>
 
 
 ## Data Pre-processing
