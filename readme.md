@@ -21,7 +21,7 @@ The first project (`/2016/`)focuses on developing a geostatisctial model to inte
 > A Geostatistical Approach to Estimate High Resolution Nocturnal Bird Migration Densities from a Weather Radar Network. Nussbaumer, R.; Benoit, L.; Mariethoz, G.; Liechti, F.; Bauer, S.; Schmid, B. *Remote Sens*. **2019**, 11, 2233. DOI:[10.3390/rs11192233](https://doi.org/10.3390/rs11192233).
   
 **Demo:**
-[bmm.raphaelnussbaumer.com/2016](https://bmm.raphaelnussbaumer.com/2016)
+[birdmigrationmap.vogelwarte.ch/2016](https://birdmigrationmap.vogelwarte.ch/2018/)
 
 
 
@@ -34,7 +34,7 @@ In the second project (`/2018/`), we use a flow model (from fluid dynamic) to qu
 
 
 **Demo:**
-[bmm.raphaelnussbaumer.com/2018](https://bmm.raphaelnussbaumer.com/2018)
+[birdmigrationmap.vogelwarte.ch/2018](https://birdmigrationmap.vogelwarte.ch/2018/)
 
 
 ## Project 3: Separation of birds, insects and weathers
