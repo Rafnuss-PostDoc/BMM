@@ -48,7 +48,7 @@ This smaller third project is presenting a method to differentiate bird, insect 
   
 ## Project 4: Windsupport
 
-Study the influence of windspeed on groundspeed and airspeed in time and space. The MATLAB code an be found at [rafnuss-postdoc.github.io/BMM/WindSupport/HTML/script](https://rafnuss-postdoc.github.io/BMM/WindSupport/HTML/script.html).
+Study the influence of windspeed on groundspeed and airspeed in time and space. The MATLAB code an be found at [rafnuss-postdoc.github.io/BMM/WindSupport/HTML/scriptTable.html](https://rafnuss-postdoc.github.io/BMM/WindSupport/HTML/scriptTable.html).
 
 
 ## Project 5: Particle Tracking
