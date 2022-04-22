@@ -71,5 +71,4 @@ Temporary Items
 2016/eurobirdPortal/EBP_files/*.csv
 WindSupport/figure/*
 
-
-WindFarm/WT_data/*
+WindFarm/data/WT_data/*
