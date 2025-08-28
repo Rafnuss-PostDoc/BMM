@@ -6,10 +6,10 @@
 
 load('data/windfarms_processed.mat')
 load('data/energy_processed.mat');
-load('../2018/data/Density_estimationMap','g');
-load('../2018/data/Density_estimationMap','gd');
-load('../2018/data/Flight_estimationMap','guv');
-load('./data/ratio');
+load('data/2018/Density_estimationMap','g');
+load('data/2018/Density_estimationMap','gd');
+load('data/2018/Flight_estimationMap','guv');
+load('data/ratio');
 addpath('functions')
 
 %% 
