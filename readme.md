@@ -65,3 +65,5 @@ We combine birdflow map with the windturbine map to estime the number of bird at
 3. [Interpolation of the ratio of bird flying at wind turbine height](https://birdmigrationmap.github.io/BMM/WindFarm/HTML/C_interpolate_height_ratio)
 4. [Estimate the number of birds at risk](https://birdmigrationmap.github.io/BMM/WindFarm/HTML/D_bird_at_risk)
 5. [Mitigation scenarios](https://birdmigrationmap.github.io/BMM/WindFarm/HTML/E_mitigation_scenario)
+
+> Bird migration and wind-energy production across Western Europe. Bauer, S., Nussbaumer, R., Rojas Tito, D.A. et al. **2026**. _Nat Sustain_. [10.1038/s41893-026-01853-4](https://doi.org/10.1038/s41893-026-01853-4)
